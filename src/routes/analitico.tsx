@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { FileDown, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ZONES, fmtDur, fmtTime, labelTipo, useSim, zoneOf, type Incident } from "@/lib/sim";
+import { fmtDur, fmtTime, labelTipo, useSim, zoneOf, type Incident } from "@/lib/store";
 
 export const Route = createFileRoute("/analitico")({
   head: () => ({
@@ -39,13 +39,13 @@ export function Analitico() {
   for (let k = 5; k >= 0; k--) {
     const d = new Date(s.now); d.setMonth(d.getMonth() - k);
     const list = s.incidents.filter((i) => { const x = new Date(i.criado_em); return x.getMonth() === d.getMonth() && x.getFullYear() === d.getFullYear(); });
-    months.push({ m: MESES[d.getMonth()], ocorrencias: list.length, quedas: list.filter((i) => i.tipo === "queda" && i.status !== "falso_positivo").length });
+    months.push({ m: MESES[d.getMonth()] ?? "", ocorrencias: list.length, quedas: list.filter((i) => i.tipo === "queda" && i.status !== "falso_positivo").length });
   }
-  const weeks = Array.from({ length: 12 }, (_, k) => ({ s: `S${k + 1}`, indice: +(30 + Math.sin(k / 2) * 3 + k * 0.4).toFixed(1) }));
-  const byZone = ZONES.map((z) => ({ zona: z.nome, n: inc.filter((i) => i.zone_id === z.id).length })).sort((a, b) => b.n - a.n);
+  const weeks = s.heatWeekly.map((x) => ({ s: new Date(x.semana).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "UTC" }), indice: x.media }));
+  const byZone = s.zones.map((z) => ({ zona: z.nome, n: inc.filter((i) => i.zone_id === z.id).length })).sort((a, b) => b.n - a.n);
   const top = byZone[0];
   const topTipo = Object.entries(inc.filter((i) => zoneOf(i.zone_id).nome === top?.zona).reduce<Record<string, number>>((a, i) => ((a[i.tipo] = (a[i.tipo] ?? 0) + 1), a), {})).sort((a, b) => b[1] - a[1])[0]?.[0];
-  const rec = topTipo === "calor" ? "ampliar pausas de hidratação e rodízio a cada 45 min" : topTipo === "gas" ? "revisar exaustão e calibrar detectores de CO" : topTipo === "queda" ? "inspecionar pisos, guarda-corpos e acessos" : "reforçar inspeção dos EPIs e treinamento da equipe";
+  const rec = topTipo === "calor" ? "ampliar pausas de hidratação e rodízio a cada 45 min" : topTipo === "gas" ? "revisar a exaustão e calibrar os sensores de gás" : topTipo === "queda" || topTipo === "caido" ? "inspecionar pisos, guarda-corpos e acessos" : "reforçar inspeção dos EPIs e treinamento da equipe";
   const today = s.incidents.filter((i) => s.now - i.criado_em < D);
 
   const kpis = [["Dias sem ocorrência grave", String(diasSem)], ["Tempo médio de resposta", fmtDur(avg)], ["Ocorrências no período", String(inc.length)], ["Falsos positivos", `${fp.toFixed(1).replace(".", ",")}%`]];
@@ -62,7 +62,7 @@ export function Analitico() {
         <div className="grid gap-4 md:grid-cols-2">
           <div className={card}><h3 className="mb-2 font-semibold">Ocorrências por mês</h3><ResponsiveContainer height={220}><BarChart data={months}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="m" {...axis} /><YAxis {...axis} /><Tooltip {...tip} /><Bar dataKey="ocorrencias" name="Ocorrências" fill="var(--primary)" radius={[3, 3, 0, 0]} /></BarChart></ResponsiveContainer></div>
           <div className={card}><h3 className="mb-2 font-semibold">Quedas confirmadas por mês</h3><ResponsiveContainer height={220}><BarChart data={months}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="m" {...axis} /><YAxis allowDecimals={false} {...axis} /><Tooltip {...tip} /><Bar dataKey="quedas" name="Quedas" fill="var(--crit)" radius={[3, 3, 0, 0]} /></BarChart></ResponsiveContainer></div>
-          <div className={card}><h3 className="mb-2 font-semibold">Índice de calor médio semanal</h3><ResponsiveContainer height={220}><LineChart data={weeks}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="s" {...axis} /><YAxis domain={[25, 40]} {...axis} /><Tooltip {...tip} /><ReferenceLine y={35} stroke="var(--warn)" strokeDasharray="4 4" label={{ value: "Limite 35 °C", fill: "var(--warn)", fontSize: 12 }} /><Line dataKey="indice" name="Índice °C" stroke="var(--primary)" strokeWidth={2} dot={false} /></LineChart></ResponsiveContainer></div>
+          <div className={card}><h3 className="mb-2 font-semibold">Sensação térmica média semanal</h3><ResponsiveContainer height={220}><LineChart data={weeks}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="s" {...axis} /><YAxis domain={[25, 40]} {...axis} /><Tooltip {...tip} /><ReferenceLine y={35} stroke="var(--warn)" strokeDasharray="4 4" label={{ value: "Limite 35 °C", fill: "var(--warn)", fontSize: 12 }} /><Line dataKey="indice" name="Índice °C" stroke="var(--primary)" strokeWidth={2} dot={false} /></LineChart></ResponsiveContainer></div>
           <div className={card}><h3 className="mb-2 font-semibold">Ocorrências por zona</h3><ResponsiveContainer height={180}><BarChart data={byZone} layout="vertical" margin={{ left: 40 }}><XAxis type="number" {...axis} /><YAxis type="category" dataKey="zona" width={110} {...axis} /><Tooltip {...tip} /><Bar dataKey="n" name="Ocorrências" fill="var(--warn)" radius={[0, 3, 3, 0]} /></BarChart></ResponsiveContainer>
             {top && <p className="mt-2 flex gap-2 rounded bg-surface-2 p-2 text-sm"><Lightbulb className="size-4 shrink-0 text-primary" /><span><b>{top.zona}</b> concentra mais alertas{topTipo ? ` (principalmente ${labelTipo(topTipo as never).toLowerCase()})` : ""}. Recomendação: {rec}.</span></p>}
           </div>
@@ -71,7 +71,7 @@ export function Analitico() {
       <aside className={card}>
         <h3 className="mb-2 font-semibold">Log do dia</h3>
         <table className="w-full text-sm"><thead className="text-left text-xs text-muted-foreground"><tr><th className="py-1">Hora</th><th>Ocorrência</th><th>Trabalhador</th><th>Zona</th><th>Status</th><th>Resp.</th></tr></thead>
-          <tbody>{today.map((i) => <tr key={i.id} className="border-t border-border"><td className="py-2 font-mono">{fmtTime(i.criado_em).slice(0, 5)}</td><td>{labelTipo(i.tipo)}</td><td>{s.workers.find((w) => w.id === i.worker_id)!.nome.split(" ")[0]}</td><td>{zoneOf(i.zone_id).nome.split(" ")[0]}</td><td>{STATUS[i.status]}</td><td className="font-mono">{i.reconhecido_em ? fmtDur(i.reconhecido_em - i.criado_em) : "—"}</td></tr>)}</tbody></table>
+          <tbody>{today.map((i) => <tr key={i.id} className="border-t border-border"><td className="py-2 font-mono">{fmtTime(i.criado_em).slice(0, 5)}</td><td>{labelTipo(i.tipo)}</td><td>{s.workers.find((w) => w.id === i.worker_id)?.nome.split(" ")[0] ?? "—"}</td><td>{zoneOf(i.zone_id).nome.split(" ")[0]}</td><td>{STATUS[i.status]}</td><td className="font-mono">{i.reconhecido_em ? fmtDur(i.reconhecido_em - i.criado_em) : "—"}</td></tr>)}</tbody></table>
       </aside>
     </div>
   );
@@ -79,7 +79,7 @@ export function Analitico() {
 
 async function exportPdf(inc: Incident[], kpis: string[][], now: number) {
   const { jsPDF } = await import("jspdf");
-  const s = (await import("@/lib/sim")).getState();
+  const s = (await import("@/lib/store")).getState();
   const doc = new jsPDF();
   doc.setFontSize(16); doc.text("Relatório SESMT — Painel de Segurança", 14, 18);
   doc.setFontSize(10); doc.text(`Gerado em ${new Date(now).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}`, 14, 25);
@@ -87,8 +87,8 @@ async function exportPdf(inc: Incident[], kpis: string[][], now: number) {
   y += 4; doc.setFontSize(12); doc.text("Ocorrências", 14, y); y += 6; doc.setFontSize(9);
   inc.slice(0, 120).forEach((i) => {
     if (y > 285) { doc.addPage(); y = 15; }
-    const w = s.workers.find((x) => x.id === i.worker_id)!;
-    doc.text(`${new Date(i.criado_em).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}  ${labelTipo(i.tipo)}  ${w.nome}  ${zoneOf(i.zone_id).nome}  ${STATUS[i.status]}`, 14, y); y += 5;
+    const w = s.workers.find((x) => x.id === i.worker_id);
+    doc.text(`${new Date(i.criado_em).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}  ${labelTipo(i.tipo)}  ${w?.nome ?? "—"}  ${zoneOf(i.zone_id).nome}  ${STATUS[i.status]}`, 14, y); y += 5;
   });
   doc.save("relatorio-sesmt.pdf");
 }
