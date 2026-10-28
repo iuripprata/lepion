@@ -94,6 +94,7 @@ function build(): State {
   const today = (i: number, tipo: IncType, sev: "atencao" | "critico", ago: number, detalhe: string, status: IncStatus = "aberto") => {
     const w = workers[i]; incidents.push({ id: `t${i}${tipo}`, worker_id: w.id, device_id: w.device_id, zone_id: w.zone_id, tipo, severidade: sev, status, criado_em: BASE - ago, snapshot: { ...current[w.device_id] }, detalhe, ...(status !== "aberto" ? { reconhecido_em: BASE - ago + 30000, reconhecido_por: "Operador" } : {}) });
   };
+  today(0, "queda", "critico", 40000, "Queda detectada");
   today(1, "calor", "atencao", 2 * MIN + 49000, "Calor · 39,8 °C");
   today(2, "calor", "atencao", 4 * MIN, "Calor · 38,9 °C");
   today(3, "gas", "atencao", 9 * MIN, "Gás CO · 32 ppm", "em_atendimento");
