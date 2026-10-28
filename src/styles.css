@@ -7,6 +7,7 @@
 @theme inline {
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: "Exo 2", "IBM Plex Sans", system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -38,31 +39,32 @@
 }
 
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.17 0.01 260);       /* #0E1116 */
-  --foreground: oklch(0.94 0.01 240);       /* #E6EDF3 */
-  --card: oklch(0.21 0.013 260);            /* #161B22 */
-  --card-foreground: oklch(0.94 0.01 240);
-  --surface-2: oklch(0.25 0.015 260);
-  --popover: oklch(0.21 0.013 260);
-  --popover-foreground: oklch(0.94 0.01 240);
-  --primary: oklch(0.73 0.16 55);           /* #F0883E */
-  --primary-foreground: oklch(0.17 0.01 260);
-  --secondary: oklch(0.25 0.015 260);
-  --secondary-foreground: oklch(0.94 0.01 240);
-  --muted: oklch(0.25 0.015 260);
-  --muted-foreground: oklch(0.71 0.025 255); /* #9AA4B2 */
-  --accent: oklch(0.27 0.018 260);
-  --accent-foreground: oklch(0.94 0.01 240);
-  --destructive: oklch(0.66 0.21 25);
-  --destructive-foreground: oklch(0.17 0.01 260);
-  --border: oklch(0.31 0.02 260);           /* #2A313C */
-  --input: oklch(0.31 0.02 260);
-  --ring: oklch(0.73 0.16 55);
-  --ok: oklch(0.7 0.18 145);                /* #3FB950 */
-  --warn: oklch(0.79 0.14 85);              /* #E3B341 */
-  --crit: oklch(0.66 0.21 25);              /* #F85149 */
-  --off: oklch(0.66 0.02 255);              /* #8B949E */
+  /* Estilo "LEPION — Noite Industrial" (design system aprovado, cores tiradas do pitch) */
+  --radius: 0.75rem;                        /* radius-md 12px */
+  --background: #15193F;                    /* noite-900 */
+  --foreground: #E6E9FC;                    /* tinta */
+  --card: #1F2458;                          /* noite-800 */
+  --card-foreground: #E6E9FC;
+  --surface-2: #2A3070;                     /* noite-700 */
+  --popover: #1F2458;
+  --popover-foreground: #E6E9FC;
+  --primary: #8EA8FF;                       /* lavanda-400 (marca) */
+  --primary-foreground: #15193F;            /* on-lavanda */
+  --secondary: #2A3070;
+  --secondary-foreground: #E6E9FC;
+  --muted: #2A3070;
+  --muted-foreground: #B7BEE6;              /* tinta-suave: legível também sobre noite-700 */
+  --accent: #2A3070;
+  --accent-foreground: #E6E9FC;
+  --destructive: #FF6B6B;
+  --destructive-foreground: #15193F;
+  --border: #2A3070;                        /* noite-700 */
+  --input: #6477A1;                         /* linha-fraca: borda de campo com 3:1 */
+  --ring: #8EA8FF;
+  --ok: #44C47A;
+  --warn: #F2B84B;
+  --crit: #FF6B6B;                          /* critico-texto: legível como texto e como preenchimento */
+  --off: #8A93B8;
 }
 
 @layer base {
@@ -72,6 +74,7 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
   }
+  h1, h2 { font-family: var(--font-display); }
 }
 
 @keyframes crit-pulse { 0%,100% { opacity: 1 } 50% { opacity: .55 } }

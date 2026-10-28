@@ -85,7 +85,7 @@ export function CriticalOverlay() {
             <div className="flex items-center gap-2 font-mono text-sm font-semibold text-crit"><svg viewBox="0 0 12 12" className="size-3 fill-crit" aria-hidden><rect width="12" height="12" /></svg>ALERTA CRÍTICO · {acked ? "RECONHECIDO" : "ALARME SONORO ATIVO"}</div>
             <h1 className="mt-1 text-3xl font-semibold">{inc.detalhe || labelTipo(inc.tipo)} — {w?.nome ?? inc.device_id}</h1>
           </div>
-          <div className="text-right"><div className="text-sm text-muted-foreground">Tempo desde o evento</div><div className="font-mono text-5xl font-semibold text-crit">{fmtDur(el)}</div></div>
+          <div className="text-right"><div className="text-sm text-muted-foreground">Tempo desde o evento</div><div className="font-display tabular-nums text-5xl font-semibold text-crit">{fmtDur(el)}</div></div>
         </div>
         {!acked && <p className="mt-3 text-sm">Reconheça o alerta para silenciar o alarme. O tempo até o reconhecimento entra no indicador de tempo de resposta.</p>}
       </div>
@@ -103,7 +103,7 @@ export function CriticalOverlay() {
           </div>
           <section><h2 className="mb-3 font-semibold">Leituras do EPI no momento do evento</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-              {readings.map(([l, v, n]) => <div key={l} className="rounded-lg border border-border bg-card p-3"><div className="text-xs text-muted-foreground">{l}</div><div className="font-mono text-2xl font-semibold">{v}</div><div className="text-xs text-muted-foreground">{n}</div></div>)}
+              {readings.map(([l, v, n]) => <div key={l} className="rounded-lg border border-border bg-card p-3"><div className="text-xs text-muted-foreground">{l}</div><div className="font-display tabular-nums text-2xl font-semibold">{v}</div><div className="text-xs text-muted-foreground">{n}</div></div>)}
             </div></section>
           <section><h2 className="mb-3 font-semibold">Linha do tempo do evento</h2>
             <ol className="space-y-3 border-l-2 border-border pl-5">
