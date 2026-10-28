@@ -1,4 +1,4 @@
-import type { Sev } from "@/lib/sim";
+import type { Sev } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const SEV_LABEL: Record<Sev, string> = { ok: "OK", atencao: "ATENÇÃO", critico: "CRÍTICO", offline: "OFFLINE" };
