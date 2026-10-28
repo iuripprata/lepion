@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AnaliticoRouteImport } from './routes/analitico'
+import { Route as DispositivosRouteImport } from './routes/dispositivos'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as TrabalhadorIdRouteImport } from './routes/trabalhador.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnaliticoRoute = AnaliticoRouteImport.update({
+  id: '/analitico',
+  path: '/analitico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DispositivosRoute = DispositivosRouteImport.update({
+  id: '/dispositivos',
+  path: '/dispositivos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrabalhadorIdRoute = TrabalhadorIdRouteImport.update({
+  id: '/trabalhador/$id',
+  path: '/trabalhador/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analitico': typeof AnaliticoRoute
+  '/dispositivos': typeof DispositivosRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/trabalhador/$id': typeof TrabalhadorIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analitico': typeof AnaliticoRoute
+  '/dispositivos': typeof DispositivosRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/trabalhador/$id': typeof TrabalhadorIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analitico': typeof AnaliticoRoute
+  '/dispositivos': typeof DispositivosRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/trabalhador/$id': typeof TrabalhadorIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/analitico' | '/dispositivos' | '/relatorios' | '/trabalhador/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/analitico' | '/dispositivos' | '/relatorios' | '/trabalhador/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/analitico'
+    | '/dispositivos'
+    | '/relatorios'
+    | '/trabalhador/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnaliticoRoute: typeof AnaliticoRoute
+  DispositivosRoute: typeof DispositivosRoute
+  RelatoriosRoute: typeof RelatoriosRoute
+  TrabalhadorIdRoute: typeof TrabalhadorIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +95,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analitico': {
+      id: '/analitico'
+      path: '/analitico'
+      fullPath: '/analitico'
+      preLoaderRoute: typeof AnaliticoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dispositivos': {
+      id: '/dispositivos'
+      path: '/dispositivos'
+      fullPath: '/dispositivos'
+      preLoaderRoute: typeof DispositivosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trabalhador/$id': {
+      id: '/trabalhador/$id'
+      path: '/trabalhador/$id'
+      fullPath: '/trabalhador/$id'
+      preLoaderRoute: typeof TrabalhadorIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnaliticoRoute: AnaliticoRoute,
+  DispositivosRoute: DispositivosRoute,
+  RelatoriosRoute: RelatoriosRoute,
+  TrabalhadorIdRoute: TrabalhadorIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
