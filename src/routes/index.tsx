@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Monitoramento — Painel de Segurança" },
+      { title: "Painel LEPION" },
       { name: "description", content: "Status em tempo real dos trabalhadores e mapa de risco por zona da usina." },
-      { property: "og:title", content: "Monitoramento — Painel de Segurança" },
+      { property: "og:title", content: "Painel LEPION" },
       { property: "og:description", content: "Status em tempo real dos trabalhadores e mapa de risco por zona da usina." },
     ],
   }),

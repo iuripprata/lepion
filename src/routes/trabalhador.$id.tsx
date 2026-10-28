@@ -12,9 +12,9 @@ import {
 export const Route = createFileRoute("/trabalhador/$id")({
   head: () => ({
     meta: [
-      { title: "Trabalhador — Painel de Segurança" },
+      { title: "Trabalhador — Painel LEPION" },
       { name: "description", content: "Leituras do EPI, exposição ao calor e histórico do trabalhador." },
-      { property: "og:title", content: "Trabalhador — Painel de Segurança" },
+      { property: "og:title", content: "Trabalhador — Painel LEPION" },
       { property: "og:description", content: "Leituras do EPI, exposição ao calor e histórico do trabalhador." },
     ],
   }),

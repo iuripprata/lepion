@@ -8,9 +8,9 @@ import { fmtDur, fmtTime, labelTipo, useSim, zoneOf, type Incident } from "@/lib
 export const Route = createFileRoute("/analitico")({
   head: () => ({
     meta: [
-      { title: "Analítico — Painel de Segurança" },
+      { title: "Analítico — Painel LEPION" },
       { name: "description", content: "Indicadores de ocorrências, quedas, calor e zonas de risco para o SESMT." },
-      { property: "og:title", content: "Analítico — Painel de Segurança" },
+      { property: "og:title", content: "Analítico — Painel LEPION" },
       { property: "og:description", content: "Indicadores de ocorrências, quedas, calor e zonas de risco para o SESMT." },
     ],
   }),
@@ -81,7 +81,7 @@ async function exportPdf(inc: Incident[], kpis: string[][], now: number) {
   const { jsPDF } = await import("jspdf");
   const s = (await import("@/lib/store")).getState();
   const doc = new jsPDF();
-  doc.setFontSize(16); doc.text("Relatório SESMT — Painel de Segurança", 14, 18);
+  doc.setFontSize(16); doc.text("Relatório SESMT — Painel LEPION", 14, 18);
   doc.setFontSize(10); doc.text(`Gerado em ${new Date(now).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}`, 14, 25);
   let y = 35; kpis.forEach(([l, v]) => { doc.text(`${l}: ${v}`, 14, y); y += 6; });
   y += 4; doc.setFontSize(12); doc.text("Ocorrências", 14, y); y += 6; doc.setFontSize(9);

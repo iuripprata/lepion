@@ -5,9 +5,9 @@ import { SevTag } from "@/components/sev";
 export const Route = createFileRoute("/dispositivos")({
   head: () => ({
     meta: [
-      { title: "Dispositivos — Painel de Segurança" },
+      { title: "Dispositivos — Painel LEPION" },
       { name: "description", content: "Bateria, sinal, sincronização e calibração dos EPIs conectados." },
-      { property: "og:title", content: "Dispositivos — Painel de Segurança" },
+      { property: "og:title", content: "Dispositivos — Painel LEPION" },
       { property: "og:description", content: "Bateria, sinal, sincronização e calibração dos EPIs conectados." },
     ],
   }),
