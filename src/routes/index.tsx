@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Monitoramento — Painel de Segurança" },
+      { title: "Painel LEPION" },
       { name: "description", content: "Status em tempo real dos trabalhadores e mapa de risco por zona da usina." },
-      { property: "og:title", content: "Monitoramento — Painel de Segurança" },
+      { property: "og:title", content: "Painel LEPION" },
       { property: "og:description", content: "Status em tempo real dos trabalhadores e mapa de risco por zona da usina." },
     ],
   }),
@@ -46,7 +46,7 @@ function Monitor() {
         {kpis.map(([l, v, sub, c]) => (
           <div key={l} className="rounded-lg border border-border bg-card p-4">
             <div className="text-xs font-semibold tracking-wide text-muted-foreground">{l}</div>
-            <div className={`font-mono text-3xl font-semibold ${c}`}>{v}</div>
+            <div className={`font-display tabular-nums text-3xl font-semibold ${c}`}>{v}</div>
             <div className="truncate text-xs text-muted-foreground">{sub}</div>
           </div>
         ))}
@@ -96,7 +96,7 @@ function Monitor() {
                 return (
                   <div key={z.id} className={`min-h-44 rounded-lg border-2 bg-surface-2 p-3 ${vazia ? "border-border" : sevBorder(worst)} ${worst === "critico" ? "bg-crit/10" : worst === "atencao" ? "bg-warn/5" : ""}`}>
                     <div className="flex items-start justify-between"><div><div className="font-semibold">{z.nome}</div><div className="font-mono text-xs text-muted-foreground">Gateway {z.gateway_id}</div></div>{vazia ? <span className="rounded border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground">SEM EPI</span> : <SevTag sev={worst} />}</div>
-                    <div className={`mt-3 font-mono text-2xl font-semibold ${worst === "ok" || vazia ? "" : sevText(worst)}`}>{main[0]}</div>
+                    <div className={`mt-3 font-display tabular-nums text-2xl font-semibold ${worst === "ok" || vazia ? "" : sevText(worst)}`}>{main[0]}</div>
                     <div className="text-xs text-muted-foreground">{main[1]}</div>
                     <div className="mt-3 flex items-center justify-between">
                       <div className="flex flex-wrap gap-1">{all.map((x) => <span key={x.w.id} title={`${x.w.nome} · ${SEV_LABEL[x.sev]}`}><SevShape sev={x.sev} className="size-2.5" /></span>)}</div>

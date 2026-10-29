@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { Loader2, Power, ShieldAlert, Zap } from "lucide-react";
+import { Loader2, Power, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { fmtDate, fmtTime, setFilter, setSimulador, simulateEvent, startStore, useSim } from "@/lib/store";
 import { CriticalOverlay } from "./CriticalOverlay";
@@ -50,8 +50,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-border bg-card">
         <div className="flex flex-wrap items-center gap-4 px-4 py-2">
           <Link to="/" className="flex items-center gap-2 font-semibold">
-            <span className="grid size-8 place-items-center rounded bg-primary text-primary-foreground"><ShieldAlert className="size-5" /></span>
-            Painel de Segurança
+            <img src="/lepion-logo.png" alt="LEPION" width={38} height={40} className="h-10 w-auto" />
+            <span className="font-display text-lg">Painel de Segurança</span>
           </Link>
           <nav className="flex gap-1">
             {tabs.map((t) => (

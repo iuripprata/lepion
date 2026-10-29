@@ -8,9 +8,9 @@ import { fmtDur, fmtTime, labelTipo, useSim, zoneOf, type Incident } from "@/lib
 export const Route = createFileRoute("/analitico")({
   head: () => ({
     meta: [
-      { title: "Analítico — Painel de Segurança" },
+      { title: "Analítico — Painel LEPION" },
       { name: "description", content: "Indicadores de ocorrências, quedas, calor e zonas de risco para o SESMT." },
-      { property: "og:title", content: "Analítico — Painel de Segurança" },
+      { property: "og:title", content: "Analítico — Painel LEPION" },
       { property: "og:description", content: "Indicadores de ocorrências, quedas, calor e zonas de risco para o SESMT." },
     ],
   }),
@@ -60,7 +60,7 @@ export function Analitico() {
           {(["hoje", "7d", "6m"] as const).map((k) => <Button key={k} variant={p === k ? "default" : "outline"} className="h-11" onClick={() => setP(k)}>{{ hoje: "Hoje", "7d": "7 dias", "6m": "6 meses" }[k]}</Button>)}
           <Button className="ml-auto h-11" variant="outline" onClick={() => exportPdf(inc, kpis, s.now)}><FileDown />Exportar relatório SESMT</Button>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{kpis.map(([l, v]) => <div key={l} className={card}><div className="text-xs text-muted-foreground">{l}</div><div className="font-mono text-3xl font-semibold">{v}</div></div>)}</div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{kpis.map(([l, v]) => <div key={l} className={card}><div className="text-xs text-muted-foreground">{l}</div><div className="font-display tabular-nums text-3xl font-semibold">{v}</div></div>)}</div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className={card}><h3 className="mb-2 font-semibold">Ocorrências por mês</h3><ResponsiveContainer height={220}><BarChart data={months}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="m" {...axis} /><YAxis {...axis} /><Tooltip {...tip} /><Bar dataKey="ocorrencias" name="Ocorrências" fill="var(--primary)" radius={[3, 3, 0, 0]} /></BarChart></ResponsiveContainer></div>
           <div className={card}><h3 className="mb-2 font-semibold">Quedas confirmadas por mês</h3><ResponsiveContainer height={220}><BarChart data={months}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="m" {...axis} /><YAxis allowDecimals={false} {...axis} /><Tooltip {...tip} /><Bar dataKey="quedas" name="Quedas" fill="var(--crit)" radius={[3, 3, 0, 0]} /></BarChart></ResponsiveContainer></div>
@@ -83,7 +83,7 @@ async function exportPdf(inc: Incident[], kpis: string[][], now: number) {
   const { jsPDF } = await import("jspdf");
   const s = (await import("@/lib/store")).getState();
   const doc = new jsPDF();
-  doc.setFontSize(16); doc.text("Relatório SESMT — Painel de Segurança", 14, 18);
+  doc.setFontSize(16); doc.text("Relatório SESMT — Painel LEPION", 14, 18);
   doc.setFontSize(10); doc.text(`Gerado em ${new Date(now).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}`, 14, 25);
   let y = 35; kpis.forEach(([l, v]) => { doc.text(`${l}: ${v}`, 14, y); y += 6; });
   y += 4; doc.setFontSize(12); doc.text("Ocorrências", 14, y); y += 6; doc.setFontSize(9);
