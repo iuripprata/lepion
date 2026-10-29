@@ -7,6 +7,7 @@ import {
   workerStatus,
   fmtGas,
   rssiPct,
+  filtrarSimulados,
   type Device,
   type Incident,
   type State,
@@ -190,5 +191,45 @@ describe("datas sem hora", () => {
         timeZone: "America/Sao_Paulo",
       }),
     ).toBe("28/10/2026");
+  });
+});
+
+describe("simulador desligado", () => {
+  const dev = (id: string, simulado: boolean): Device => ({
+    id,
+    worker_id: `w-${id}`,
+    tipo: "capacete",
+    zone_id: "alto-forno",
+    simulado,
+    bateria: null,
+    rssi: null,
+    ultimo_sinal_em: null,
+    ultima_calibracao_gas: null,
+  });
+  const wk = (id: string): Worker => ({
+    id: `w-${id}`,
+    nome: id,
+    cargo: "Operador",
+    turno: "A",
+    supervisor: false,
+    checkin: null,
+    ultima_pausa: null,
+    device_id: id,
+    zone_id: "alto-forno",
+  });
+  const devices = { capacete01: dev("capacete01", false), "EPI-0142": dev("EPI-0142", true) };
+  const workers = [wk("capacete01"), wk("EPI-0142")];
+
+  it("mostra todos com o simulador ligado", () => {
+    expect(filtrarSimulados(workers, devices, true).map((w) => w.device_id)).toEqual([
+      "capacete01",
+      "EPI-0142",
+    ]);
+  });
+
+  it("mostra só os EPIs físicos com o simulador desligado", () => {
+    expect(filtrarSimulados(workers, devices, false).map((w) => w.device_id)).toEqual([
+      "capacete01",
+    ]);
   });
 });

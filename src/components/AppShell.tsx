@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { Loader2, ShieldAlert, Zap } from "lucide-react";
+import { Loader2, Power, ShieldAlert, Zap } from "lucide-react";
 import { toast } from "sonner";
-import { fmtDate, fmtTime, setFilter, simulateEvent, startStore, useSim } from "@/lib/store";
+import { fmtDate, fmtTime, setFilter, setSimulador, simulateEvent, startStore, useSim } from "@/lib/store";
 import { CriticalOverlay } from "./CriticalOverlay";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
 const tabs = [
@@ -24,16 +24,27 @@ async function simular(kind: "queda" | "calor" | "gas") {
   }
 }
 
+async function alternarSimulador(ativo: boolean) {
+  try {
+    await setSimulador(ativo);
+    toast.success(ativo ? "Simulador ligado: os trabalhadores simulados voltaram ao painel." : "Simulador desligado: o painel mostra só os EPIs físicos.");
+  } catch (e) {
+    toast.error((e as Error).message || "Não foi possível alterar o simulador.");
+  }
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => startStore(), []);
   const ready = useSim((s) => s.ready);
   const error = useSim((s) => s.error);
   const live = useSim((s) => s.live);
   const zones = useSim((s) => s.zones);
-  // horário do dado mais recente recebido de qualquer EPI
-  const last = useSim((s) => Object.values(s.devices).reduce((m, d) => Math.max(m, d.ultimo_sinal_em ?? 0), 0));
+  // horário do dado mais recente entre os EPIs visíveis no painel
+  const last = useSim((s) => s.workers.reduce((m, w) => Math.max(m, s.devices[w.device_id]?.ultimo_sinal_em ?? 0), 0));
   const shift = useSim((s) => s.shift);
   const zf = useSim((s) => s.zoneFilter);
+  const simuladorAtivo = useSim((s) => s.simuladorAtivo);
+  const nSimulados = useSim((s) => Object.values(s.devices).filter((d) => d.simulado && d.worker_id).length);
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 border-b border-border bg-card">
@@ -66,10 +77,18 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Button variant="outline" className="h-11 border-primary text-primary hover:bg-primary hover:text-primary-foreground"><Zap /> Simular evento</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <div className="max-w-60 px-2 py-1 text-xs text-muted-foreground">Modo demonstração: afeta só trabalhadores simulados</div>
-                <DropdownMenuItem className="min-h-11" onClick={() => void simular("queda")}>Queda</DropdownMenuItem>
-                <DropdownMenuItem className="min-h-11" onClick={() => void simular("calor")}>Calor acima do limite</DropdownMenuItem>
-                <DropdownMenuItem className="min-h-11" onClick={() => void simular("gas")}>Vazamento de gás</DropdownMenuItem>
+                <div className="max-w-60 px-2 py-1 text-xs text-muted-foreground">
+                  {simuladorAtivo ? "Modo demonstração: afeta só trabalhadores simulados" : "Ligue o simulador para simular eventos"}
+                </div>
+                <DropdownMenuItem className="min-h-11" disabled={!simuladorAtivo} onClick={() => void simular("queda")}>Queda</DropdownMenuItem>
+                <DropdownMenuItem className="min-h-11" disabled={!simuladorAtivo} onClick={() => void simular("calor")}>Calor acima do limite</DropdownMenuItem>
+                <DropdownMenuItem className="min-h-11" disabled={!simuladorAtivo} onClick={() => void simular("gas")}>Vazamento de gás</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="min-h-11" onClick={() => void alternarSimulador(!simuladorAtivo)}>
+                  <Power />
+                  {simuladorAtivo ? "Desligar simulador" : "Ligar simulador"}
+                  <span className="ml-auto text-xs text-muted-foreground">{simuladorAtivo ? `${nSimulados} simulados` : "desligado"}</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
