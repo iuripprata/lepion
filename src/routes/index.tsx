@@ -90,10 +90,13 @@ function Monitor() {
                 else if (minU < z.limite_umidade_min) main = [`${Math.round(minU)}%`, "Umidade relativa (ar seco)"];
                 else if (maxS >= z.limite_sensacao) main = [`${fmt1(maxS)} °C`, "Sensação térmica máxima na zona"];
                 const all = ws.filter((x) => x.w.zone_id === z.id);
+                // zona sem ninguém vinculado (ex.: simulador desligado) fica neutra, não "offline"
+                const vazia = all.length === 0;
+                if (vazia) main = ["—", "Nenhum EPI nesta zona"];
                 return (
-                  <div key={z.id} className={`min-h-44 rounded-lg border-2 bg-surface-2 p-3 ${sevBorder(worst)} ${worst === "critico" ? "bg-crit/10" : worst === "atencao" ? "bg-warn/5" : ""}`}>
-                    <div className="flex items-start justify-between"><div><div className="font-semibold">{z.nome}</div><div className="font-mono text-xs text-muted-foreground">Gateway {z.gateway_id}</div></div><SevTag sev={worst} /></div>
-                    <div className={`mt-3 font-display tabular-nums text-2xl font-semibold ${worst === "ok" ? "" : sevText(worst)}`}>{main[0]}</div>
+                  <div key={z.id} className={`min-h-44 rounded-lg border-2 bg-surface-2 p-3 ${vazia ? "border-border" : sevBorder(worst)} ${worst === "critico" ? "bg-crit/10" : worst === "atencao" ? "bg-warn/5" : ""}`}>
+                    <div className="flex items-start justify-between"><div><div className="font-semibold">{z.nome}</div><div className="font-mono text-xs text-muted-foreground">Gateway {z.gateway_id}</div></div>{vazia ? <span className="rounded border border-border px-2 py-0.5 font-mono text-xs text-muted-foreground">SEM EPI</span> : <SevTag sev={worst} />}</div>
+                    <div className={`mt-3 font-display tabular-nums text-2xl font-semibold ${worst === "ok" || vazia ? "" : sevText(worst)}`}>{main[0]}</div>
                     <div className="text-xs text-muted-foreground">{main[1]}</div>
                     <div className="mt-3 flex items-center justify-between">
                       <div className="flex flex-wrap gap-1">{all.map((x) => <span key={x.w.id} title={`${x.w.nome} · ${SEV_LABEL[x.sev]}`}><SevShape sev={x.sev} className="size-2.5" /></span>)}</div>

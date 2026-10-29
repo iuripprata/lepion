@@ -45,7 +45,9 @@ export function Analitico() {
   const byZone = s.zones.map((z) => ({ zona: z.nome, n: inc.filter((i) => i.zone_id === z.id).length })).sort((a, b) => b.n - a.n);
   const top = byZone[0];
   const topTipo = Object.entries(inc.filter((i) => zoneOf(i.zone_id).nome === top?.zona).reduce<Record<string, number>>((a, i) => ((a[i.tipo] = (a[i.tipo] ?? 0) + 1), a), {})).sort((a, b) => b[1] - a[1])[0]?.[0];
-  const rec = topTipo === "calor" ? "ampliar pausas de hidratação e rodízio a cada 45 min" : topTipo === "gas" ? "revisar a exaustão e calibrar os sensores de gás" : topTipo === "queda" || topTipo === "caido" ? "inspecionar pisos, guarda-corpos e acessos" : "reforçar inspeção dos EPIs e treinamento da equipe";
+  // desmaio ou queda causados pelo calor pedem a recomendação de calor, não a de pisos
+  const porCalor = inc.some((i) => zoneOf(i.zone_id).nome === top?.zona && /calor/i.test(i.detalhe));
+  const rec = topTipo === "calor" || porCalor ? "ampliar pausas de hidratação e rodízio a cada 45 min" : topTipo === "gas" ? "revisar a exaustão e calibrar os sensores de gás" : topTipo === "queda" || topTipo === "caido" ? "inspecionar pisos, guarda-corpos e acessos" : "reforçar inspeção dos EPIs e treinamento da equipe";
   const today = s.incidents.filter((i) => s.now - i.criado_em < D);
 
   const kpis = [["Dias sem ocorrência grave", String(diasSem)], ["Tempo médio de resposta", fmtDur(avg)], ["Ocorrências no período", String(inc.length)], ["Falsos positivos", `${fp.toFixed(1).replace(".", ",")}%`]];

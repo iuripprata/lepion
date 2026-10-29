@@ -19,7 +19,9 @@ const VALIDADE = 180 * 86_400_000;
 function Dispositivos() {
   const s = useSim((x) => x);
   // capacete físico primeiro, depois os simulados
-  const devs = Object.values(s.devices).filter((d) => d.worker_id).sort((a, b) => Number(a.simulado) - Number(b.simulado) || a.id.localeCompare(b.id));
+  // só EPIs de trabalhadores visíveis (com o simulador desligado, os simulados somem)
+  const visiveis = new Set(s.workers.map((w) => w.id));
+  const devs = Object.values(s.devices).filter((d) => d.worker_id && visiveis.has(d.worker_id)).sort((a, b) => Number(a.simulado) - Number(b.simulado) || a.id.localeCompare(b.id));
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <h1 className="mb-1 text-lg font-semibold">EPIs conectados</h1>

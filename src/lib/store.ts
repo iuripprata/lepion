@@ -91,6 +91,7 @@ export interface State {
   history: Record<string, HistPoint[]>;
   heatWeekly: { semana: number; media: number }[];
   incidents: Incident[]; // mais recentes primeiro
+  simuladorAtivo: boolean; // com o simulador desligado, os trabalhadores simulados ficam escondidos
   muted: boolean;
   shift: "todos" | "A" | "B" | "C";
   zoneFilter: string;
@@ -124,6 +125,7 @@ let state: State = {
   history: {},
   heatWeekly: [],
   incidents: [],
+  simuladorAtivo: true,
   muted: false,
   shift: "todos",
   zoneFilter: "todas",
@@ -207,6 +209,7 @@ type Col =
   | "resolvido_por"
   | "semana"
   | "media"
+  | "simulador_ativo"
   | "t";
 type Row = Partial<Record<Col, unknown>>;
 const ms = (v: unknown) => (v ? Date.parse(String(v)) : null);
@@ -309,6 +312,26 @@ function link(
     });
 }
 
+// Lista completa vinda do banco; state.workers é a parte visível dela.
+let baseWorkers: Omit<Worker, "device_id" | "zone_id">[] = [];
+
+/** Com o simulador desligado, mostra só quem usa um EPI físico. */
+export function filtrarSimulados(
+  workers: Worker[],
+  devices: Record<string, Device>,
+  simuladorAtivo: boolean,
+): Worker[] {
+  return simuladorAtivo ? workers : workers.filter((w) => devices[w.device_id]?.simulado === false);
+}
+
+function relink() {
+  state.workers = filtrarSimulados(
+    link(baseWorkers, state.devices),
+    state.devices,
+    state.simuladorAtivo,
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Carga inicial + tempo real
 // ---------------------------------------------------------------------------
@@ -331,7 +354,7 @@ export function startStore() {
       const d = toDevice(p.new as Row);
       state.devices = { ...state.devices, [d.id]: d };
       state.current = { ...state.current, [d.id]: toReading((p.new as Row).ultima_leitura) };
-      state.workers = link(state.workers, state.devices);
+      relink();
       emit();
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "incidents" }, (p) => {
@@ -347,10 +370,14 @@ export function startStore() {
     })
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "workers" }, (p) => {
       const base = toWorkerBase(p.new as Row);
-      state.workers = link(
-        state.workers.map((w) => (w.id === base.id ? { ...w, ...base } : w)),
-        state.devices,
-      );
+      baseWorkers = baseWorkers.map((w) => (w.id === base.id ? { ...w, ...base } : w));
+      relink();
+      emit();
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "config" }, (p) => {
+      if (p.eventType === "DELETE") return;
+      state.simuladorAtivo = (p.new as Row).simulador_ativo !== false;
+      relink();
       emit();
     })
     .subscribe((status) => {
@@ -361,7 +388,7 @@ export function startStore() {
 
 async function loadAll(quiet = false) {
   const since = new Date(Date.now() - 183 * 86_400_000).toISOString();
-  const [z, w, d, i, h] = await Promise.all([
+  const [z, w, d, i, h, c] = await Promise.all([
     supabase.from("zones").select("*").order("ordem"),
     supabase.from("workers").select("*").order("nome"),
     supabase.from("devices").select("*"),
@@ -372,6 +399,7 @@ async function loadAll(quiet = false) {
       .order("criado_em", { ascending: false })
       .limit(3000),
     supabase.rpc("indice_calor_semanal", { p_semanas: 12 }),
+    supabase.from("config").select("simulador_ativo").maybeSingle(),
   ]);
   const err = z.error ?? w.error ?? d.error ?? i.error ?? h.error;
   if (err) {
@@ -389,7 +417,10 @@ async function loadAll(quiet = false) {
   state.zones = (z.data as Row[]).map(toZone);
   state.devices = devices;
   state.current = current;
-  state.workers = link((w.data as Row[]).map(toWorkerBase), devices);
+  // sem a tabela config (banco antigo), o simulador conta como ligado
+  state.simuladorAtivo = c.error ? true : (c.data as Row | null)?.simulador_ativo !== false;
+  baseWorkers = (w.data as Row[]).map(toWorkerBase);
+  relink();
   state.incidents = (i.data as Row[]).map(toIncident);
   state.heatWeekly = ((h.data ?? []) as Row[]).map((x) => ({
     semana: Date.parse(String(x.semana)),
@@ -464,9 +495,10 @@ export async function setIncidentStatus(id: string, status: Exclude<IncStatus, "
 }
 
 export async function registerPause(workerId: string) {
-  state.workers = state.workers.map((w) =>
+  baseWorkers = baseWorkers.map((w) =>
     w.id === workerId ? { ...w, ultima_pausa: Date.now() } : w,
   );
+  relink();
   emit();
   const { error } = await supabase.rpc("registrar_pausa", { p_worker: workerId });
   if (error) {
@@ -479,6 +511,20 @@ export async function simulateEvent(kind: "queda" | "calor" | "gas") {
   state.muted = false;
   const { error } = await supabase.rpc("simulate_event", { p_tipo: kind });
   if (error) throw error;
+}
+
+export async function setSimulador(ativo: boolean) {
+  const antes = state.simuladorAtivo;
+  state.simuladorAtivo = ativo;
+  relink();
+  emit();
+  const { error } = await supabase.rpc("definir_simulador", { p_ativo: ativo });
+  if (error) {
+    state.simuladorAtivo = antes;
+    relink();
+    emit();
+    throw error;
+  }
 }
 
 export function setFilter(p: Partial<Pick<State, "shift" | "zoneFilter" | "muted">>) {
