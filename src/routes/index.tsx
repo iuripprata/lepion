@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { fmt1, fmtGas, fmtTime, sevRank, useSim, workerStatus, zoneOf, type Sev, type State } from "@/lib/store";
+import { MonitorMobile } from "@/components/MonitorMobile";
+import { CriticalBanner } from "@/components/CriticalBanner";
 import { SEV_LABEL, SevShape, SevTag, sevBorder, sevText } from "@/components/sev";
 import { Input } from "@/components/ui/input";
 
@@ -41,7 +43,10 @@ function Monitor() {
   const list = ws.filter((x) => x.w.nome.toLowerCase().includes(q.toLowerCase()));
 
   return (
-    <div className="space-y-4">
+    <>
+    <MonitorMobile ws={ws} q={q} setQ={setQ} />
+    <div className="hidden space-y-4 lg:block">
+      <CriticalBanner />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {kpis.map(([l, v, sub, c]) => (
           <div key={l} className="rounded-lg border border-border bg-card p-4">
@@ -121,5 +126,6 @@ function Monitor() {
         </div>
       </div>
     </div>
+    </>
   );
 }

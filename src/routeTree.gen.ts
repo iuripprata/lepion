@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnaliticoRouteImport } from './routes/analitico'
 import { Route as DispositivosRouteImport } from './routes/dispositivos'
+import { Route as OcorrenciasRouteImport } from './routes/ocorrencias'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as TrabalhadorIdRouteImport } from './routes/trabalhador.$id'
 
@@ -30,6 +31,11 @@ const DispositivosRoute = DispositivosRouteImport.update({
   path: '/dispositivos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OcorrenciasRoute = OcorrenciasRouteImport.update({
+  id: '/ocorrencias',
+  path: '/ocorrencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RelatoriosRoute = RelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analitico': typeof AnaliticoRoute
   '/dispositivos': typeof DispositivosRoute
+  '/ocorrencias': typeof OcorrenciasRoute
   '/relatorios': typeof RelatoriosRoute
   '/trabalhador/$id': typeof TrabalhadorIdRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analitico': typeof AnaliticoRoute
   '/dispositivos': typeof DispositivosRoute
+  '/ocorrencias': typeof OcorrenciasRoute
   '/relatorios': typeof RelatoriosRoute
   '/trabalhador/$id': typeof TrabalhadorIdRoute
 }
@@ -60,20 +68,33 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analitico': typeof AnaliticoRoute
   '/dispositivos': typeof DispositivosRoute
+  '/ocorrencias': typeof OcorrenciasRoute
   '/relatorios': typeof RelatoriosRoute
   '/trabalhador/$id': typeof TrabalhadorIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/analitico' | '/dispositivos' | '/relatorios' | '/trabalhador/$id'
+    | '/'
+    | '/analitico'
+    | '/dispositivos'
+    | '/ocorrencias'
+    | '/relatorios'
+    | '/trabalhador/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analitico' | '/dispositivos' | '/relatorios' | '/trabalhador/$id'
+  to:
+    | '/'
+    | '/analitico'
+    | '/dispositivos'
+    | '/ocorrencias'
+    | '/relatorios'
+    | '/trabalhador/$id'
   id:
     | '__root__'
     | '/'
     | '/analitico'
     | '/dispositivos'
+    | '/ocorrencias'
     | '/relatorios'
     | '/trabalhador/$id'
   fileRoutesById: FileRoutesById
@@ -82,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnaliticoRoute: typeof AnaliticoRoute
   DispositivosRoute: typeof DispositivosRoute
+  OcorrenciasRoute: typeof OcorrenciasRoute
   RelatoriosRoute: typeof RelatoriosRoute
   TrabalhadorIdRoute: typeof TrabalhadorIdRoute
 }
@@ -109,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DispositivosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ocorrencias': {
+      id: '/ocorrencias'
+      path: '/ocorrencias'
+      fullPath: '/ocorrencias'
+      preLoaderRoute: typeof OcorrenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/relatorios': {
       id: '/relatorios'
       path: '/relatorios'
@@ -130,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnaliticoRoute: AnaliticoRoute,
   DispositivosRoute: DispositivosRoute,
+  OcorrenciasRoute: OcorrenciasRoute,
   RelatoriosRoute: RelatoriosRoute,
   TrabalhadorIdRoute: TrabalhadorIdRoute,
 }
