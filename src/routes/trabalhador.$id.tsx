@@ -74,11 +74,11 @@ function Perfil() {
   return (
     <div className="space-y-4">
       <Link to="/" className="inline-flex h-11 items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="size-4" />Voltar ao monitoramento</Link>
-      <div className={`${card} flex flex-wrap items-center gap-6`}>
-        <div className="grid size-16 place-items-center rounded-full bg-surface-2 text-xl font-semibold">{w.nome.split(" ").map((p) => p[0]).join("").slice(0, 2)}</div>
-        <div className="flex-1"><h1 className="text-2xl font-semibold">{w.nome}</h1><div className="text-muted-foreground">{w.cargo} · Turno {w.turno} · Zona {z.nome}</div><div className="mt-1 text-sm">{st.motivo}</div></div>
-        <SevTag sev={st.sev} className="text-sm" />
-        <dl className="grid grid-cols-3 gap-6 text-sm">
+      <div className={`${card} flex flex-wrap items-center gap-4 md:gap-6`}>
+        <div className="grid size-12 shrink-0 place-items-center self-start rounded-full bg-surface-2 text-lg font-semibold md:size-16 md:self-auto md:text-xl">{w.nome.split(" ").map((p) => p[0]).join("").slice(0, 2)}</div>
+        <div className="min-w-0 flex-1"><SevTag sev={st.sev} className="mb-1 md:hidden" /><h1 className="text-2xl font-semibold">{w.nome}</h1><div className="text-muted-foreground">{w.cargo} · Turno {w.turno} · Zona {z.nome}</div><div className="mt-1 text-sm">{st.motivo}</div></div>
+        <SevTag sev={st.sev} className="text-sm max-md:hidden" />
+        <dl className="grid w-full grid-cols-2 gap-4 text-sm sm:grid-cols-3 md:w-auto md:gap-6">
           <div><dt className="text-muted-foreground">EPI vinculado</dt><dd className="font-mono">{w.device_id} · {d?.simulado ? "simulado" : "físico"}</dd></div>
           <div><dt className="text-muted-foreground">Check-in</dt><dd className="font-mono">{w.checkin ? fmtTime(w.checkin).slice(0, 5) : "—"}</dd></div>
           <div><dt className="text-muted-foreground">Último sinal</dt><dd className="font-mono">{fmtTime(d?.ultimo_sinal_em)}</dd></div>
@@ -92,9 +92,9 @@ function Perfil() {
             {abertos.map((i) => (
               <li key={i.id} className="flex flex-wrap items-center gap-3 py-2 text-sm">
                 <span className="font-mono text-muted-foreground">{fmtTime(i.criado_em).slice(0, 5)}</span>
-                <span className="flex-1">{i.detalhe} · {STATUS[i.status]}</span>
-                <Button variant="outline" className="h-11" onClick={() => void run(setIncidentStatus(i.id, "resolvido"), "Ocorrência encerrada.")}>Encerrar</Button>
-                <Button variant="ghost" className="h-11" onClick={() => void run(setIncidentStatus(i.id, "falso_positivo"), "Marcado como falso positivo.")}>Falso positivo</Button>
+                <span className="min-w-[60%] flex-1">{i.detalhe} · {STATUS[i.status]}</span>
+                <Button variant="outline" className="h-11 flex-1 md:flex-none" onClick={() => void run(setIncidentStatus(i.id, "resolvido"), "Ocorrência encerrada.")}>Encerrar</Button>
+                <Button variant="ghost" className="h-11 flex-1 md:flex-none" onClick={() => void run(setIncidentStatus(i.id, "falso_positivo"), "Marcado como falso positivo.")}>Falso positivo</Button>
               </li>
             ))}
           </ul>
@@ -102,12 +102,12 @@ function Perfil() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-6">{cards.map(([l, v, bad]) => <div key={l} className={`${card} ${bad ? "border-warn" : ""}`}><div className="text-xs text-muted-foreground">{l}</div><div className={`font-display tabular-nums text-2xl font-semibold ${bad ? "text-warn" : ""}`}>{v}</div>{bad && <div className="text-xs text-warn">▲ fora do limite</div>}</div>)}</div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">{cards.map(([l, v, bad]) => <div key={l} className={`${card} ${bad ? "border-warn" : ""}`}><div className="text-xs text-muted-foreground">{l}</div><div className={`font-display tabular-nums text-2xl font-semibold ${bad ? "text-warn" : ""}`}>{v}</div>{bad && <div className="text-xs text-warn">▲ fora do limite</div>}</div>)}</div>
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         <div className={card}>
           <h2 className="mb-2 font-semibold">Sensação térmica nas últimas 8 horas</h2>
           {chart.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">Sem leituras nas últimas 8 horas.</p> : (
-            <ResponsiveContainer height={260}>
+            <ResponsiveContainer height={240}>
               <ComposedChart data={chart}><CartesianGrid stroke="var(--border)" vertical={false} /><XAxis dataKey="t" interval={Math.max(0, Math.floor(chart.length / 8))} {...axis} /><YAxis domain={[24, 44]} {...axis} />
                 <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)" }} />
                 <ReferenceArea y1={z.limite_sensacao} y2={44} fill="var(--crit)" fillOpacity={0.12} />
@@ -135,7 +135,7 @@ function Perfil() {
       <div className={card}>
         <h2 className="mb-2 font-semibold">Histórico dos últimos 30 dias</h2>
         {past.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma ocorrência.</p> :
-          <ul className="divide-y divide-border text-sm">{past.map((i) => <li key={i.id} className="flex gap-4 py-2"><span className="font-mono text-muted-foreground">{fmtDate(i.criado_em)} {fmtTime(i.criado_em).slice(0, 5)}</span><span className="flex-1">{i.detalhe || labelTipo(i.tipo)} · {zoneOf(i.zone_id).nome}</span><span className="text-muted-foreground">{STATUS[i.status]}{i.resolvido_por === "sistema" ? " (automático)" : ""}</span></li>)}</ul>}
+          <ul className="divide-y divide-border text-sm">{past.map((i) => <li key={i.id} className="flex flex-wrap gap-x-4 gap-y-1 py-2"><span className="font-mono text-muted-foreground">{fmtDate(i.criado_em)} {fmtTime(i.criado_em).slice(0, 5)}</span><span className="flex-1">{i.detalhe || labelTipo(i.tipo)} · {zoneOf(i.zone_id).nome}</span><span className="text-muted-foreground">{STATUS[i.status]}{i.resolvido_por === "sistema" ? " (automático)" : ""}</span></li>)}</ul>}
       </div>
       <p className="flex items-center gap-2 text-xs text-muted-foreground"><Lock className="size-3" />Dados usados apenas para segurança.</p>
     </div>

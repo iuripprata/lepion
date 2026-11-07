@@ -79,17 +79,17 @@ export function CriticalOverlay() {
 
   return (
     <div role="alertdialog" aria-label="Alerta crítico" className="fixed inset-0 z-50 overflow-y-auto bg-background">
-      <div className={`border-b-4 border-crit bg-crit/15 px-6 py-5 ${acked ? "" : "animate-crit"}`}>
+      <div className={`border-b-4 border-crit bg-crit/15 px-4 pb-4 pt-[max(env(safe-area-inset-top),16px)] md:px-6 md:py-5 ${acked ? "" : "animate-crit"}`}>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 font-mono text-sm font-semibold text-crit"><svg viewBox="0 0 12 12" className="size-3 fill-crit" aria-hidden><rect width="12" height="12" /></svg>ALERTA CRÍTICO · {acked ? "RECONHECIDO" : "ALARME SONORO ATIVO"}</div>
-            <h1 className="mt-1 text-3xl font-semibold">{inc.detalhe || labelTipo(inc.tipo)} — {w?.nome ?? inc.device_id}</h1>
+            <h1 className="mt-1 text-2xl font-semibold md:text-3xl">{inc.detalhe || labelTipo(inc.tipo)} — {w?.nome ?? inc.device_id}</h1>
           </div>
-          <div className="text-right"><div className="text-sm text-muted-foreground">Tempo desde o evento</div><div className="font-display tabular-nums text-5xl font-semibold text-crit">{fmtDur(el)}</div></div>
+          <div className="md:text-right"><div className="text-sm text-muted-foreground">Tempo desde o evento</div><div className="font-display tabular-nums text-4xl font-semibold text-crit md:text-5xl">{fmtDur(el)}</div></div>
         </div>
         {!acked && <p className="mt-3 text-sm">Reconheça o alerta para silenciar o alarme. O tempo até o reconhecimento entra no indicador de tempo de resposta.</p>}
       </div>
-      <div className="grid gap-6 p-6 lg:grid-cols-[1fr_340px]">
+      <div className="grid gap-6 p-4 pb-[max(env(safe-area-inset-bottom),16px)] md:p-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <div className="grid gap-4 rounded-lg border border-border bg-card p-5 md:grid-cols-3">
             <div className="flex gap-3"><div className="grid size-12 place-items-center rounded-full bg-surface-2 font-semibold">{(w?.nome ?? "?").split(" ").map((p) => p[0]).join("").slice(0, 2)}</div>
@@ -110,7 +110,7 @@ export function CriticalOverlay() {
               {timeline.map(([t, a, b]) => <li key={a} className="relative"><span className="absolute -left-[27px] top-1.5 size-3 rounded-full bg-primary" /><div className="font-mono text-sm text-muted-foreground">{fmtTime(t)}</div><div className="font-semibold">{a}</div><div className="text-sm text-muted-foreground">{b}</div></li>)}
             </ol></section>
         </div>
-        <aside className="space-y-3">
+        <aside className="order-first space-y-3 lg:order-none">
           <h2 className="font-semibold">Resposta</h2>
           <Button className={`${btn} bg-crit text-background hover:bg-crit/90`} onClick={() => void run(acknowledgeIncident(inc.id), "Alerta reconhecido. Alarme silenciado.")} disabled={acked}><Check />{acked ? "Alerta reconhecido" : "Reconhecer alerta"}</Button>
           <Button variant="outline" className={btn} onClick={() => void run(setIncidentStatus(inc.id, "em_atendimento"), "Brigada de emergência acionada. Ocorrência em atendimento.")}><Siren />Acionar brigada de emergência</Button>

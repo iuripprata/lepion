@@ -54,11 +54,11 @@ export function Analitico() {
   const card = "rounded-lg border border-border bg-card p-4";
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1fr_440px]">
-      <div className="space-y-4">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,1fr)_440px]">
+      <div className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          {(["hoje", "7d", "6m"] as const).map((k) => <Button key={k} variant={p === k ? "default" : "outline"} className="h-11" onClick={() => setP(k)}>{{ hoje: "Hoje", "7d": "7 dias", "6m": "6 meses" }[k]}</Button>)}
-          <Button className="ml-auto h-11" variant="outline" onClick={() => exportPdf(inc, kpis, s.now)}><FileDown />Exportar relatório SESMT</Button>
+          {(["hoje", "7d", "6m"] as const).map((k) => <Button key={k} variant={p === k ? "default" : "outline"} className="h-11 flex-1 sm:flex-none" onClick={() => setP(k)}>{{ hoje: "Hoje", "7d": "7 dias", "6m": "6 meses" }[k]}</Button>)}
+          <Button className="h-11 w-full sm:ml-auto sm:w-auto" variant="outline" onClick={() => exportPdf(inc, kpis, s.now)}><FileDown />Exportar relatório SESMT</Button>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{kpis.map(([l, v]) => <div key={l} className={card}><div className="text-xs text-muted-foreground">{l}</div><div className="font-display tabular-nums text-3xl font-semibold">{v}</div></div>)}</div>
         <div className="grid gap-4 md:grid-cols-2">
@@ -72,8 +72,8 @@ export function Analitico() {
       </div>
       <aside className={card}>
         <h3 className="mb-2 font-semibold">Log do dia</h3>
-        <table className="w-full text-sm"><thead className="text-left text-xs text-muted-foreground"><tr><th className="py-1">Hora</th><th>Ocorrência</th><th>Trabalhador</th><th>Zona</th><th>Status</th><th>Resp.</th></tr></thead>
-          <tbody>{today.map((i) => <tr key={i.id} className="border-t border-border"><td className="py-2 font-mono">{fmtTime(i.criado_em).slice(0, 5)}</td><td>{labelTipo(i.tipo)}</td><td>{s.workers.find((w) => w.id === i.worker_id)?.nome.split(" ")[0] ?? "—"}</td><td>{zoneOf(i.zone_id).nome.split(" ")[0]}</td><td>{STATUS[i.status]}</td><td className="font-mono">{i.reconhecido_em ? fmtDur(i.reconhecido_em - i.criado_em) : "—"}</td></tr>)}</tbody></table>
+        <div className="-mx-4 overflow-x-auto px-4"><table className="w-full min-w-[460px] text-sm"><thead className="text-left text-xs text-muted-foreground"><tr><th className="py-1">Hora</th><th>Ocorrência</th><th>Trabalhador</th><th>Zona</th><th>Status</th><th>Resp.</th></tr></thead>
+          <tbody>{today.map((i) => <tr key={i.id} className="border-t border-border"><td className="py-2 font-mono">{fmtTime(i.criado_em).slice(0, 5)}</td><td>{labelTipo(i.tipo)}</td><td>{s.workers.find((w) => w.id === i.worker_id)?.nome.split(" ")[0] ?? "—"}</td><td>{zoneOf(i.zone_id).nome.split(" ")[0]}</td><td>{STATUS[i.status]}</td><td className="font-mono">{i.reconhecido_em ? fmtDur(i.reconhecido_em - i.criado_em) : "—"}</td></tr>)}</tbody></table></div>
       </aside>
     </div>
   );
