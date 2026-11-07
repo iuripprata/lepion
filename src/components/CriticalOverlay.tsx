@@ -46,11 +46,32 @@ function timelineOf(inc: Incident): [number, string, string][] {
   return [...steps, [t, "Alerta recebido pela plataforma", "Sala de controle notificada com alarme sonoro."]];
 }
 
+// Pedido para abrir o alerta em tela cheia (ex.: toque na faixa vermelha do monitoramento).
+let pedirAlerta: ((id: string) => void) | null = null;
+export function abrirAlerta(id: string) {
+  pedirAlerta?.(id);
+}
+
+const criticoAberto = (i: Incident) => i.severidade === "critico" && i.status === "aberto";
+
 export function CriticalOverlay() {
   const s = useSim((x) => x);
   const [dismissed, setDismissed] = useState<string[]>([]);
-  const inc = s.incidents.find((i) => i.severidade === "critico" && i.status === "aberto" && !dismissed.includes(i.id));
-  const unacked = s.incidents.some((i) => i.severidade === "critico" && i.status === "aberto" && !i.reconhecido_em);
+  // Ao abrir o painel, a primeira tela é o monitoramento: alertas que já existiam aparecem
+  // na faixa vermelha e só tomam a tela inteira se alguém tocar nela. Alertas novos,
+  // que chegam com o painel aberto, continuam abrindo a tela cheia sozinhos.
+  const [jaExistiam] = useState(() => new Set(s.incidents.filter(criticoAberto).map((i) => i.id)));
+  const [pedido, setPedido] = useState<string | null>(null);
+  useEffect(() => {
+    pedirAlerta = (id) => {
+      setPedido(id);
+      setDismissed((x) => x.filter((d) => d !== id));
+    };
+    return () => { pedirAlerta = null; };
+  }, []);
+  const visivel = (i: Incident) => criticoAberto(i) && !dismissed.includes(i.id) && (i.id === pedido || !jaExistiam.has(i.id));
+  const inc = s.incidents.find((i) => i.id === pedido && visivel(i)) ?? s.incidents.find(visivel);
+  const unacked = s.incidents.some((i) => visivel(i) && !i.reconhecido_em);
   useAlarm(unacked && !s.muted);
   if (!inc) return null;
 
@@ -122,7 +143,7 @@ export function CriticalOverlay() {
             <Button variant="outline" className="mt-2 h-11 w-full justify-start" onClick={() => toast(`Previsto: ligar para ${sup?.nome ?? "o supervisor"} pela central telefônica.`)}><Phone />Ligar para {sup?.nome ?? "supervisor"}</Button>
             <Button variant="outline" className="mt-2 h-11 w-full justify-start" onClick={() => toast("Previsto: o firmware v2 ainda não recebe comandos da plataforma.")}><Vibrate />Enviar aviso ao EPI</Button>
           </div>
-          <Button variant="secondary" className={btn} onClick={() => setDismissed((x) => [...x, inc.id])}><ArrowLeft />Voltar ao monitoramento</Button>
+          <Button variant="secondary" className={btn} onClick={() => { setDismissed((x) => [...x, inc.id]); setPedido(null); }}><ArrowLeft />Voltar ao monitoramento</Button>
         </aside>
       </div>
     </div>

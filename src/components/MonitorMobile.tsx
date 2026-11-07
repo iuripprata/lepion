@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ChevronRight, Search } from "lucide-react";
 import { fmt1, fmtGas, fmtTime, isOpen, setFilter, sevRank, useSim, zoneOf, type Sev, type Worker } from "@/lib/store";
 import { SEV_LABEL, SevShape, SevTag, sevBorder } from "@/components/sev";
+import { CriticalBanner } from "@/components/CriticalBanner";
 
 type Row = { w: Worker; sev: Sev; motivo: string };
 
@@ -19,7 +20,6 @@ const sobretitulo = "font-sans text-[13px] font-semibold uppercase tracking-[0.2
 export function MonitorMobile({ ws, q, setQ }: { ws: Row[]; q: string; setQ: (v: string) => void }) {
   const s = useSim((x) => x);
   const count = (k: Sev) => ws.filter((x) => x.sev === k).length;
-  const crit = ws.find((x) => x.sev === "critico");
   const pedem = ws.length - count("ok");
   // contagem por zona respeita o turno, mas não o filtro de zona (os botões são o próprio filtro)
   const doTurno = s.workers.filter((w) => s.shift === "todos" || w.turno === s.shift);
@@ -65,17 +65,7 @@ export function MonitorMobile({ ws, q, setQ }: { ws: Row[]; q: string; setQ: (v:
 
   return (
     <div className="space-y-6 lg:hidden">
-      {crit && (
-        <Link to="/trabalhador/$id" params={{ id: crit.w.id }} className="flex items-center gap-3 rounded-xl bg-crit p-4 text-background">
-          <svg viewBox="0 0 12 12" className="size-7 shrink-0 fill-background" aria-hidden><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" /></svg>
-          <span className="min-w-0 flex-1">
-            <span className="block text-xs font-bold uppercase tracking-[0.08em]">Crítico · {crit.motivo.split(" · ").pop()}</span>
-            <span className="block font-display text-lg font-bold leading-6">{crit.w.nome} · {zoneOf(crit.w.zone_id).nome}</span>
-            <span className="block text-[13px] leading-[18px]">{crit.motivo.split(" · ")[0]}</span>
-          </span>
-          <ChevronRight className="size-5 shrink-0" aria-hidden />
-        </Link>
-      )}
+      <CriticalBanner />
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
