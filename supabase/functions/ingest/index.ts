@@ -35,7 +35,9 @@ const NUMERIC = [
   "gas_razao",
   "bateria",
   "rssi",
-  // firmware v3
+];
+// firmware v3: opcionais; valor inválido é descartado em vez de recusar a leitura
+const NUMERIC_V3 = [
   "pico_g",
   "pico_giro",
   "queda_livre_ms",
@@ -75,16 +77,18 @@ Deno.serve(async (req) => {
       return json(400, { ok: false, erro: `campo ${k} deve ser numérico` });
     }
   }
+  for (const k of NUMERIC_V3) {
+    if (k in p && p[k] !== null && (typeof p[k] !== "number" || !Number.isFinite(p[k] as number))) delete p[k];
+  }
 
-  if ("detalhe" in p && p.detalhe !== null && typeof p.detalhe !== "string") {
-    return json(400, { ok: false, erro: "campo detalhe deve ser texto" });
-  }
-  if ("tipo_queda" in p && p.tipo_queda !== null && p.tipo_queda !== "" && !TIPOS_QUEDA.includes(String(p.tipo_queda))) {
-    return json(400, { ok: false, erro: "campo tipo_queda inválido" });
-  }
-  if ("consciente" in p && p.consciente !== null && typeof p.consciente !== "boolean") {
-    return json(400, { ok: false, erro: "campo consciente deve ser true ou false" });
-  }
+  // Campos do v3 com formato errado são descartados, nunca recusados: uma leitura de
+  // emergência não pode se perder porque o texto ou o tipo da queda veio estranho.
+  const descartados: string[] = [];
+  if ("detalhe" in p && p.detalhe !== null && typeof p.detalhe !== "string") descartados.push("detalhe");
+  if ("tipo_queda" in p && p.tipo_queda !== null && !TIPOS_QUEDA.includes(String(p.tipo_queda))) descartados.push("tipo_queda");
+  if ("consciente" in p && p.consciente !== null && typeof p.consciente !== "boolean") descartados.push("consciente");
+  for (const k of descartados) delete p[k];
+  if (descartados.length) console.warn("campos do v3 descartados", p.id, descartados);
 
   const { data, error } = await supabase.rpc("ingest_device", { p_device: p.id, p_key: key, p });
   if (error) {
