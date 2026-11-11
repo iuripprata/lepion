@@ -54,7 +54,28 @@ export interface Reading {
   nivel?: string;
   evento?: string;
   criado_em?: number;
+  // firmware v3: análise da queda feita no próprio capacete (todos opcionais)
+  detalhe?: string;
+  tipo_queda?: TipoQueda;
+  pico_g?: number;
+  pico_giro?: number;
+  queda_livre_ms?: number;
+  consciente?: boolean;
+  score_risco?: number;
+  nota_gas?: number;
+  nota_calor?: number;
+  ia_prob?: number;
 }
+/** Tipo provável da queda, enviado pelo firmware v3. */
+export type TipoQueda = "queda_parado" | "queda_se_mexendo" | "pancada" | "queda_lenta" | "capacete_fora" | "sos";
+export const TIPO_QUEDA: Record<TipoQueda, string> = {
+  queda_parado: "Queda, parado no chão",
+  queda_se_mexendo: "Queda, se mexendo depois",
+  pancada: "Pancada na cabeça",
+  queda_lenta: "Queda lenta",
+  capacete_fora: "Capacete fora da cabeça",
+  sos: "SOS acionado",
+};
 export interface Incident {
   id: string;
   worker_id: string;
@@ -164,6 +185,16 @@ export const __setState = (s: Partial<State>) => {
 // ---------------------------------------------------------------------------
 // colunas conhecidas (evita índices genéricos, exigido pelo tsconfig)
 type Col =
+  | "detalhe"
+  | "tipo_queda"
+  | "pico_g"
+  | "pico_giro"
+  | "queda_livre_ms"
+  | "consciente"
+  | "score_risco"
+  | "nota_gas"
+  | "nota_calor"
+  | "ia_prob"
   | "id"
   | "nome"
   | "gateway_id"
@@ -262,7 +293,34 @@ export function toReading(v: unknown): Reading {
   if (typeof r.nivel === "string") out.nivel = r.nivel;
   if (typeof r.evento === "string") out.evento = r.evento;
   if (r.criado_em) out.criado_em = Date.parse(String(r.criado_em));
+  // firmware v3
+  if (typeof r.detalhe === "string" && r.detalhe.trim()) out.detalhe = r.detalhe.trim();
+  if (typeof r.tipo_queda === "string" && r.tipo_queda in TIPO_QUEDA) out.tipo_queda = r.tipo_queda as TipoQueda;
+  for (const k of ["pico_g", "pico_giro", "queda_livre_ms", "score_risco", "nota_gas", "nota_calor", "ia_prob"] as const) {
+    if (typeof r[k] === "number" && Number.isFinite(r[k])) out[k] = r[k] as number;
+  }
+  if (typeof r.consciente === "boolean") out.consciente = r.consciente;
   return out;
+}
+
+/** Resumo legível da análise de queda do firmware v3; null quando a leitura não traz nenhum campo novo. */
+export function analiseQueda(r: Reading) {
+  const tem = r.tipo_queda !== undefined || r.consciente !== undefined || r.ia_prob !== undefined || r.score_risco !== undefined || r.pico_g !== undefined;
+  if (!tem) return null;
+  const ia = r.ia_prob === undefined ? null : Math.round(Math.min(1, Math.max(0, r.ia_prob)) * 100);
+  const risco = r.score_risco === undefined ? null : Math.round(Math.min(100, Math.max(0, r.score_risco)));
+  return {
+    tipo: r.tipo_queda ? TIPO_QUEDA[r.tipo_queda] : null,
+    consciente: r.consciente === undefined ? null : r.consciente ? "Se mexeu: provavelmente consciente" : "Parado: possível desacordado",
+    desacordado: r.consciente === false || r.tipo_queda === "queda_parado",
+    ia,
+    risco,
+    pico_g: r.pico_g ?? null,
+    pico_giro: r.pico_giro ?? null,
+    queda_livre_ms: r.queda_livre_ms ?? null,
+    nota_gas: r.nota_gas ?? null,
+    nota_calor: r.nota_calor ?? null,
+  };
 }
 function toWorkerBase(r: Row): Omit<Worker, "device_id" | "zone_id"> {
   return {

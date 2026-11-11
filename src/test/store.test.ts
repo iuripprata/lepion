@@ -8,6 +8,7 @@ import {
   fmtGas,
   rssiPct,
   filtrarSimulados,
+  analiseQueda,
   type Device,
   type Incident,
   type State,
@@ -231,5 +232,30 @@ describe("simulador desligado", () => {
     expect(filtrarSimulados(workers, devices, false).map((w) => w.device_id)).toEqual([
       "capacete01",
     ]);
+  });
+});
+
+describe("firmware v3: análise da queda", () => {
+  it("lê os campos novos do snapshot e ignora tipos desconhecidos", () => {
+    const r = toReading({
+      detalhe: "Queda de ~30 cm para o lado, parado: possivel desacordado (4.0 g)",
+      tipo_queda: "queda_parado",
+      pico_g: 4.0,
+      consciente: false,
+      score_risco: 88,
+      ia_prob: 0.91,
+    });
+    expect(r.tipo_queda).toBe("queda_parado");
+    expect(r.consciente).toBe(false);
+    expect(toReading({ tipo_queda: "inventado" }).tipo_queda).toBeUndefined();
+    const a = analiseQueda(r)!;
+    expect(a.tipo).toBe("Queda, parado no chão");
+    expect(a.desacordado).toBe(true);
+    expect(a.ia).toBe(91);
+    expect(a.risco).toBe(88);
+  });
+
+  it("não mostra análise para leituras do v2", () => {
+    expect(analiseQueda(toReading({ aceleracao_g: 3.4, evento: "QUEDA" }))).toBeNull();
   });
 });

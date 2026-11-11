@@ -5,6 +5,7 @@ import { ArrowLeft, Coffee, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SevTag } from "@/components/sev";
+import { AnaliseQueda } from "@/components/AnaliseQueda";
 import {
   fmt1, fmtDate, fmtGas, fmtTime, isOpen, labelTipo, loadHistory, registerPause, setIncidentStatus, useSim, workerStatus, zoneOf,
 } from "@/lib/store";
@@ -135,7 +136,7 @@ function Perfil() {
       <div className={card}>
         <h2 className="mb-2 font-semibold">Histórico dos últimos 30 dias</h2>
         {past.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma ocorrência.</p> :
-          <ul className="divide-y divide-border text-sm">{past.map((i) => <li key={i.id} className="flex flex-wrap gap-x-4 gap-y-1 py-2"><span className="font-mono text-muted-foreground">{fmtDate(i.criado_em)} {fmtTime(i.criado_em).slice(0, 5)}</span><span className="flex-1">{i.detalhe || labelTipo(i.tipo)} · {zoneOf(i.zone_id).nome}</span><span className="text-muted-foreground">{STATUS[i.status]}{i.resolvido_por === "sistema" ? " (automático)" : ""}</span></li>)}</ul>}
+          <ul className="divide-y divide-border text-sm">{past.map((i) => <li key={i.id} className="flex flex-wrap gap-x-4 gap-y-1 py-2"><span className="font-mono text-muted-foreground">{fmtDate(i.criado_em)} {fmtTime(i.criado_em).slice(0, 5)}</span><span className="flex-1">{i.detalhe || labelTipo(i.tipo)} · {zoneOf(i.zone_id).nome}<AnaliseQueda r={i.snapshot} compacta /></span><span className="text-muted-foreground">{STATUS[i.status]}{i.resolvido_por === "sistema" ? " (automático)" : ""}</span></li>)}</ul>}
       </div>
       <p className="flex items-center gap-2 text-xs text-muted-foreground"><Lock className="size-3" />Dados usados apenas para segurança.</p>
     </div>

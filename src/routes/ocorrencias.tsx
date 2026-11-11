@@ -5,6 +5,7 @@ import {
   acknowledgeIncident, fmtTime, isOpen, labelTipo, setIncidentStatus, useSim, zoneOf, type Incident, type Sev,
 } from "@/lib/store";
 import { SevTag } from "@/components/sev";
+import { AnaliseQueda } from "@/components/AnaliseQueda";
 
 export const Route = createFileRoute("/ocorrencias")({
   head: () => ({
@@ -92,6 +93,7 @@ function Ocorrencias() {
                   ) : (
                     <span className="text-sm text-muted-foreground">{i.device_id} · {zoneOf(i.zone_id).nome}</span>
                   )}
+                  <AnaliseQueda r={i.snapshot} compacta />
                   <p className="text-[13px] leading-[18px] text-[#8E98C8]">
                     {a === "encerradas"
                       ? `${i.status === "falso_positivo" ? "Falso positivo" : "Resolvida"}${i.resolvido_em ? ` às ${fmtTime(i.resolvido_em).slice(0, 5)}` : ""}${i.resolvido_por === "sistema" ? " · encerrada pelo sistema" : i.resolvido_por ? ` · ${i.resolvido_por}` : ""}`

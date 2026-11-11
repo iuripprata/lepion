@@ -8,6 +8,11 @@
 //    "temp":31.5,"umid":55,"sensacao":33.1,"gas_bruto":812,"gas_razao":1.02,"gas_pronto":true,
 //    "bssid":"AA:BB:CC:DD:EE:FF","rssi":-61}          <- bssid, rssi e bateria são opcionais
 //
+// Firmware v3 (capacete_lepion_wifi.ino) pode mandar também, todos opcionais:
+//   "detalhe" (texto, até 140 caracteres), "tipo_queda" (queda_parado | queda_se_mexendo |
+//   pancada | queda_lenta | capacete_fora | sos), "pico_g", "pico_giro", "queda_livre_ms",
+//   "consciente" (true/false), "score_risco" (0-100), "nota_gas", "nota_calor", "ia_prob" (0-1).
+//
 // Toda a regra de negócio fica no banco (public.ingest_device → process_reading),
 // a mesma usada pelos trabalhadores simulados.
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -30,7 +35,16 @@ const NUMERIC = [
   "gas_razao",
   "bateria",
   "rssi",
+  // firmware v3
+  "pico_g",
+  "pico_giro",
+  "queda_livre_ms",
+  "score_risco",
+  "nota_gas",
+  "nota_calor",
+  "ia_prob",
 ];
+const TIPOS_QUEDA = ["queda_parado", "queda_se_mexendo", "pancada", "queda_lenta", "capacete_fora", "sos"];
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -60,6 +74,16 @@ Deno.serve(async (req) => {
     if (k in p && p[k] !== null && (typeof p[k] !== "number" || !Number.isFinite(p[k] as number))) {
       return json(400, { ok: false, erro: `campo ${k} deve ser numérico` });
     }
+  }
+
+  if ("detalhe" in p && p.detalhe !== null && typeof p.detalhe !== "string") {
+    return json(400, { ok: false, erro: "campo detalhe deve ser texto" });
+  }
+  if ("tipo_queda" in p && p.tipo_queda !== null && p.tipo_queda !== "" && !TIPOS_QUEDA.includes(String(p.tipo_queda))) {
+    return json(400, { ok: false, erro: "campo tipo_queda inválido" });
+  }
+  if ("consciente" in p && p.consciente !== null && typeof p.consciente !== "boolean") {
+    return json(400, { ok: false, erro: "campo consciente deve ser true ou false" });
   }
 
   const { data, error } = await supabase.rpc("ingest_device", { p_device: p.id, p_key: key, p });
