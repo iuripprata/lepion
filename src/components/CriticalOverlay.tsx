@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ArrowLeft, Check, CheckCheck, Phone, Siren, Vibrate, X } from "lucide-react";
+import { AnaliseQueda } from "@/components/AnaliseQueda";
 import { Button } from "@/components/ui/button";
 import {
-  acknowledgeIncident, fmt1, fmtDur, fmtGas, fmtTime, labelTipo, setIncidentStatus, useSim, zoneOf, type Incident,
+  acknowledgeIncident, fmt1, fmtDur, fmtGas, fmtTime, labelTipo, setIncidentStatus, TIPO_QUEDA, useSim, zoneOf, type Incident,
 } from "@/lib/store";
 
 function useAlarm(on: boolean) {
@@ -43,6 +44,8 @@ function timelineOf(inc: Incident): [number, string, string][] {
     gas: [[t, "Gás acima do ar limpo", inc.detalhe]],
   };
   const steps = base[inc.tipo] ?? [[t, "Leitura fora do limite", inc.detalhe]];
+  // firmware v3: o capacete manda o tipo provável da queda e um texto pronto
+  if (r.tipo_queda || r.detalhe) steps.push([t, "Capacete classificou o evento", r.detalhe ?? (r.tipo_queda ? TIPO_QUEDA[r.tipo_queda] : inc.detalhe)]);
   return [...steps, [t, "Alerta recebido pela plataforma", "Sala de controle notificada com alarme sonoro."]];
 }
 
@@ -122,6 +125,7 @@ export function CriticalOverlay() {
             <div><div className="text-xs uppercase text-muted-foreground">Local</div><div className="font-semibold">Zona {z.nome}</div><div className="text-sm text-muted-foreground">Gateway {z.gateway_id}</div></div>
             <div><div className="text-xs uppercase text-muted-foreground">Na mesma zona</div><div className="font-semibold">{same[0]?.nome ?? "Ninguém"}{same[0]?.supervisor ? " · Supervisor" : ""}</div><div className="text-sm text-muted-foreground">{same.length > 1 ? `e mais ${same.length - 1} ${same.length === 2 ? "trabalhador" : "trabalhadores"}` : ""}</div></div>
           </div>
+          <AnaliseQueda r={r} />
           <section><h2 className="mb-3 font-semibold">Leituras do EPI no momento do evento</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
               {readings.map(([l, v, n]) => <div key={l} className="rounded-lg border border-border bg-card p-3"><div className="text-xs text-muted-foreground">{l}</div><div className="font-display tabular-nums text-2xl font-semibold">{v}</div><div className="text-xs text-muted-foreground">{n}</div></div>)}
@@ -137,6 +141,7 @@ export function CriticalOverlay() {
           <Button variant="outline" className={btn} onClick={() => void run(setIncidentStatus(inc.id, "em_atendimento"), "Brigada de emergência acionada. Ocorrência em atendimento.")}><Siren />Acionar brigada de emergência</Button>
           <Button variant="outline" className={btn} onClick={() => void run(setIncidentStatus(inc.id, "resolvido"), "Ocorrência encerrada.")}><CheckCheck />Encerrar: trabalhador atendido</Button>
           <Button variant="ghost" className={btn} onClick={() => void run(setIncidentStatus(inc.id, "falso_positivo"), "Marcado como falso positivo.")}><X />Marcar como falso positivo</Button>
+          <p className="-mt-1 px-1 text-xs text-muted-foreground">Falsos positivos marcados aqui ajudam a calibrar o capacete.</p>
           <div className="mt-4 rounded-lg border border-border bg-card p-4 text-sm">
             <div className="mb-2 font-semibold">Próximas integrações</div>
             <p className="text-muted-foreground">Estes recursos ainda não estão ligados ao capacete ou a outros sistemas:</p>
