@@ -46,12 +46,12 @@ function Dispositivos() {
                 <SevTag sev={off ? "offline" : "ok"} />
               </div>
               <dl className="grid grid-cols-3 gap-2">
-                <div className="space-y-1"><dt className="text-[11px] text-[#8E98C8]">Sinal</dt><dd className="font-display text-lg font-bold">{off ? "—" : sinal === null ? "online" : `${sinal}%`}</dd>
+                <div className="space-y-1"><dt className="text-[11px] text-faint">Sinal</dt><dd className="font-display text-lg font-bold">{off ? "—" : sinal === null ? "online" : `${sinal}%`}</dd>
                   <div className="h-1.5 overflow-hidden rounded-full bg-surface-2" aria-hidden><div className="h-full rounded-full bg-primary" style={{ width: `${off ? 0 : sinal ?? 100}%` }} /></div></div>
-                <div className="space-y-1"><dt className="text-[11px] text-[#8E98C8]">Último dado</dt><dd className="font-mono text-sm leading-[22px]">{fmtTime(d.ultimo_sinal_em).slice(0, 5)}</dd></div>
-                <div className="space-y-1"><dt className="text-[11px] text-[#8E98C8]">Gás calibrado</dt><dd className={`font-mono text-sm leading-[22px] ${venc ? "text-warn" : ""}`}>{d.ultima_calibracao_gas ? fmtDate(d.ultima_calibracao_gas).slice(0, 5) : "—"}{venc ? " ▲" : ""}</dd></div>
+                <div className="space-y-1"><dt className="text-[11px] text-faint">Último dado</dt><dd className="font-mono text-sm leading-[22px]">{fmtTime(d.ultimo_sinal_em).slice(0, 5)}</dd></div>
+                <div className="space-y-1"><dt className="text-[11px] text-faint">Gás calibrado</dt><dd className={`font-mono text-sm leading-[22px] ${venc ? "text-warn-ink" : ""}`}>{d.ultima_calibracao_gas ? fmtDate(d.ultima_calibracao_gas).slice(0, 5) : "—"}{venc ? " ▲" : ""}</dd></div>
               </dl>
-              <p className="text-xs text-[#8E98C8]">{d.simulado ? "Simulado" : "Físico"} · bateria {d.bateria === null ? "não medida" : `${d.bateria}%`}{venc ? " · calibração vencida" : ""}</p>
+              <p className="text-xs text-faint">{d.simulado ? "Simulado" : "Físico"} · bateria {d.bateria === null ? "não medida" : `${d.bateria}%`}{venc ? " · calibração vencida" : ""}</p>
             </li>
           );
         })}
@@ -72,10 +72,10 @@ function Dispositivos() {
               return (
                 <tr key={d.id} className="border-t border-border">
                   <td className="py-2 font-mono">{d.id}</td><td>{d.simulado ? <span className="text-muted-foreground">Simulado</span> : <span className="font-semibold text-primary">Físico</span>}</td><td className="capitalize">{d.tipo}</td>
-                  <td>{d.bateria === null ? <span className="text-muted-foreground">não medida</span> : <span className={`font-mono ${d.bateria < 10 ? "text-crit" : d.bateria < 25 ? "text-warn" : ""}`}>{d.bateria}%</span>}</td>
+                  <td>{d.bateria === null ? <span className="text-muted-foreground">não medida</span> : <span className={`font-mono ${d.bateria < 10 ? "text-crit-ink" : d.bateria < 25 ? "text-warn-ink" : ""}`}>{d.bateria}%</span>}</td>
                   <td>{off ? <SevTag sev="offline" /> : <span className="font-mono">{sinal === null ? "online" : `${sinal}%`}</span>}</td>
                   <td className="font-mono">{fmtTime(d.ultimo_sinal_em)}</td>
-                  <td>{venc ? <span className="flex items-center gap-2"><SevTag sev="atencao" /><span className="text-warn">Vencida · {fmtDate(d.ultima_calibracao_gas)}</span></span> : <span className="font-mono">{fmtDate(d.ultima_calibracao_gas)}</span>}</td>
+                  <td>{venc ? <span className="flex items-center gap-2"><SevTag sev="atencao" /><span className="text-warn-ink">Vencida · {fmtDate(d.ultima_calibracao_gas)}</span></span> : <span className="font-mono">{fmtDate(d.ultima_calibracao_gas)}</span>}</td>
                   <td>{w ? <Link to="/trabalhador/$id" params={{ id: w.id }} className="hover:underline">{w.nome}</Link> : "—"}</td>
                 </tr>
               );

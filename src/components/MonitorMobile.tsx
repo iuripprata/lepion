@@ -50,14 +50,14 @@ export function MonitorMobile({ ws, q, setQ }: { ws: Row[]; q: string; setQ: (v:
         params={{ id: x.w.id }}
         className={`flex min-h-11 items-center gap-3 rounded-xl border bg-card p-3.5 hover:bg-accent ${x.sev === "critico" ? "border-crit" : "border-border"}`}
       >
-        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#C4D0F8] font-display text-base font-bold text-background">{iniciais(x.w.nome)}</span>
+        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-avatar font-display text-base font-bold text-noite">{iniciais(x.w.nome)}</span>
         <span className="min-w-0 flex-1 space-y-1">
           <span className="flex items-center justify-between gap-2">
             <span className="truncate font-semibold">{x.w.nome}</span>
             <SevTag sev={x.sev} />
           </span>
           <span className="block text-[13px] leading-[18px] text-muted-foreground">{x.motivo}</span>
-          <span className="block text-xs text-[#8E98C8]">{zoneOf(x.w.zone_id).nome} · {x.w.cargo}</span>
+          <span className="block text-xs text-faint">{zoneOf(x.w.zone_id).nome} · {x.w.cargo}</span>
         </span>
       </Link>
     </li>
@@ -96,7 +96,7 @@ export function MonitorMobile({ ws, q, setQ }: { ws: Row[]; q: string; setQ: (v:
               type="button"
               aria-pressed={on}
               onClick={() => setFilter({ zoneFilter: c.id })}
-              className={`h-11 shrink-0 whitespace-nowrap rounded-full border px-4 text-sm font-medium ${on ? "border-primary bg-primary text-primary-foreground" : "border-[#343878] bg-card text-foreground"}`}
+              className={`h-11 shrink-0 whitespace-nowrap rounded-full border px-4 text-sm font-medium ${on ? "border-primary bg-primary text-primary-foreground" : "border-border-strong bg-card text-foreground"}`}
             >
               {c.nome} · {c.n}
             </button>
@@ -107,7 +107,7 @@ export function MonitorMobile({ ws, q, setQ }: { ws: Row[]; q: string; setQ: (v:
       <div className="relative">
         <label htmlFor="busca-m" className="sr-only">Buscar trabalhador</label>
         <Search className="absolute left-3.5 top-3.5 size-4 text-muted-foreground" aria-hidden />
-        <input id="busca-m" type="search" placeholder="Buscar trabalhador" value={q} onChange={(e) => setQ(e.target.value)} className="h-12 w-full rounded-lg border border-[#343878] bg-card pl-10 pr-3 text-base text-foreground placeholder:text-[#8E98C8]" />
+        <input id="busca-m" type="search" placeholder="Buscar trabalhador" value={q} onChange={(e) => setQ(e.target.value)} className="h-12 w-full rounded-lg border border-border-strong bg-card pl-10 pr-3 text-base text-foreground placeholder:text-faint" />
       </div>
 
       {atencao.length > 0 && (
@@ -132,7 +132,7 @@ export function MonitorMobile({ ws, q, setQ }: { ws: Row[]; q: string; setQ: (v:
                 </span>
                 <span className="flex flex-wrap justify-between gap-2 text-[13px] leading-[18px] text-muted-foreground">
                   <span>{resumo}</span>
-                  {Number.isFinite(maxS) && <span className="font-mono text-[#8E98C8]">{fmt1(maxS)} °C · {fmtGas(Number.isFinite(maxG) ? maxG : undefined)}</span>}
+                  {Number.isFinite(maxS) && <span className="font-mono text-faint">{fmt1(maxS)} °C · {fmtGas(Number.isFinite(maxG) ? maxG : undefined)}</span>}
                 </span>
               </button>
             </li>
@@ -147,15 +147,15 @@ export function MonitorMobile({ ws, q, setQ }: { ws: Row[]; q: string; setQ: (v:
         </section>
       )}
 
-      <Link to="/ocorrencias" className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[#343878] font-semibold text-primary">
+      <Link to="/ocorrencias" className="flex h-12 items-center justify-center gap-2 rounded-xl border border-border-strong font-semibold text-primary">
         Ocorrências abertas · {recentes}
         <ChevronRight className="size-4" aria-hidden />
       </Link>
 
-      <p className="flex items-center justify-center gap-3 text-xs text-[#8E98C8]">
+      <p className="flex items-center justify-center gap-3 text-xs text-faint">
         {(["ok", "atencao", "critico", "offline"] as Sev[]).map((k) => <span key={k} className="flex items-center gap-1"><SevShape sev={k} className="size-2.5" />{SEV_LABEL[k]}</span>)}
       </p>
-      <p className="text-center text-xs text-[#8E98C8]">Dados usados apenas para segurança · atualizado {fmtTime(s.now).slice(0, 5)}</p>
+      <p className="text-center text-xs text-faint">Dados usados apenas para segurança · atualizado {fmtTime(s.now).slice(0, 5)}</p>
     </div>
   );
 }

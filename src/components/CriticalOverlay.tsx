@@ -106,10 +106,10 @@ export function CriticalOverlay() {
       <div className={`border-b-4 border-crit bg-crit/15 px-4 pb-4 pt-[max(env(safe-area-inset-top),16px)] md:px-6 md:py-5 ${acked ? "" : "animate-crit"}`}>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 font-mono text-sm font-semibold text-crit"><svg viewBox="0 0 12 12" className="size-3 fill-crit" aria-hidden><rect width="12" height="12" /></svg>ALERTA CRÍTICO · {acked ? "RECONHECIDO" : "ALARME SONORO ATIVO"}</div>
+            <div className="flex items-center gap-2 font-mono text-sm font-semibold text-crit-ink"><svg viewBox="0 0 12 12" className="size-3 fill-crit" aria-hidden><rect width="12" height="12" /></svg>ALERTA CRÍTICO · {acked ? "RECONHECIDO" : "ALARME SONORO ATIVO"}</div>
             <h1 className="mt-1 text-2xl font-semibold md:text-3xl">{inc.detalhe || labelTipo(inc.tipo)} — {w?.nome ?? inc.device_id}</h1>
           </div>
-          <div className="md:text-right"><div className="text-sm text-muted-foreground">Tempo desde o evento</div><div className="font-display tabular-nums text-4xl font-semibold text-crit md:text-5xl">{fmtDur(el)}</div></div>
+          <div className="md:text-right"><div className="text-sm text-muted-foreground">Tempo desde o evento</div><div className="font-display tabular-nums text-4xl font-semibold text-crit-ink md:text-5xl">{fmtDur(el)}</div></div>
         </div>
         {!acked && <p className="mt-3 text-sm">Reconheça o alerta para silenciar o alarme. O tempo até o reconhecimento entra no indicador de tempo de resposta.</p>}
       </div>
@@ -137,7 +137,7 @@ export function CriticalOverlay() {
         </div>
         <aside className="order-first space-y-3 lg:order-none">
           <h2 className="font-semibold">Resposta</h2>
-          <Button className={`${btn} bg-crit text-background hover:bg-crit/90`} onClick={() => void run(acknowledgeIncident(inc.id), "Alerta reconhecido. Alarme silenciado.")} disabled={acked}><Check />{acked ? "Alerta reconhecido" : "Reconhecer alerta"}</Button>
+          <Button className={`${btn} bg-crit text-on-crit hover:bg-crit/90`} onClick={() => void run(acknowledgeIncident(inc.id), "Alerta reconhecido. Alarme silenciado.")} disabled={acked}><Check />{acked ? "Alerta reconhecido" : "Reconhecer alerta"}</Button>
           <Button variant="outline" className={btn} onClick={() => void run(setIncidentStatus(inc.id, "em_atendimento"), "Brigada de emergência acionada. Ocorrência em atendimento.")}><Siren />Acionar brigada de emergência</Button>
           <Button variant="outline" className={btn} onClick={() => void run(setIncidentStatus(inc.id, "resolvido"), "Ocorrência encerrada.")}><CheckCheck />Encerrar: trabalhador atendido</Button>
           <Button variant="ghost" className={btn} onClick={() => void run(setIncidentStatus(inc.id, "falso_positivo"), "Marcado como falso positivo.")}><X />Marcar como falso positivo</Button>

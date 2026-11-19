@@ -1,12 +1,13 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Loader2, Power, Zap } from "lucide-react";
+import { Loader2, Moon, Power, Sun, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { fmtDate, fmtTime, setFilter, setSimulador, simulateEvent, startStore, useSim } from "@/lib/store";
 import { CriticalOverlay } from "./CriticalOverlay";
 import { MobileNav } from "./MobileNav";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { aplicarTema, useTema } from "@/lib/tema";
 
 const tabs = [
   { to: "/", label: "Monitoramento" },
@@ -70,6 +71,25 @@ function usePerfil() {
   return [perfil, trocar] as const;
 }
 
+/** Troca entre o tema claro (padrão) e o escuro. */
+function BotaoTema() {
+  const tema = useTema();
+  const escuro = tema === "escuro";
+  const rotulo = escuro ? "Usar tema claro" : "Usar tema escuro";
+  return (
+    <Button
+      variant="outline"
+      aria-label={rotulo}
+      title={rotulo}
+      aria-pressed={escuro}
+      className="h-11 w-11 border-border px-0 text-foreground hover:bg-accent"
+      onClick={() => aplicarTema(escuro ? "claro" : "escuro")}
+    >
+      {escuro ? <Sun /> : <Moon />}
+    </Button>
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => startStore(), []);
   const [perfil, trocarPerfil] = usePerfil();
@@ -85,7 +105,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const nSimulados = useSim((s) => Object.values(s.devices).filter((d) => d.simulado && d.worker_id).length);
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-30 border-b border-border bg-card">
+      {/* o cabeçalho fica sempre azul-noite: o logo só vai sobre fundo escuro */}
+      <header className="tema-escuro sticky top-0 z-30 border-b border-border bg-card text-foreground">
         <div className="mx-auto flex max-w-[1800px] items-center gap-3 px-4 pb-2 pt-[max(env(safe-area-inset-top),8px)] lg:flex-wrap lg:gap-4">
           <Link to="/" className="flex min-w-0 shrink items-center gap-2 font-semibold">
             <img src="/lepion-logo.png" alt="LEPION" width={38} height={40} className="h-8 w-auto shrink-0 lg:h-10" />
@@ -114,6 +135,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <option value="todas">Todas as zonas</option>
               {zones.map((z) => <option key={z.id} value={z.id}>{z.nome}</option>)}
             </select>
+            <BotaoTema />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" aria-label="Simular evento" className="h-11 w-11 border-primary px-0 text-primary hover:bg-primary hover:text-primary-foreground lg:w-auto lg:px-4"><Zap /><span className="hidden lg:inline">Simular evento</span></Button>
@@ -139,7 +161,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-[1800px] p-4 pb-28 lg:pb-4">
         {error && !ready ? (
           <div role="alert" className="mx-auto mt-16 max-w-lg rounded-lg border border-crit bg-card p-6 text-center">
-            <div className="font-semibold text-crit">Sem conexão com o banco de dados</div>
+            <div className="font-semibold text-crit-ink">Sem conexão com o banco de dados</div>
             <p className="mt-2 text-sm text-muted-foreground">{error}</p>
           </div>
         ) : !ready ? (

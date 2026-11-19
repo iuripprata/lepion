@@ -41,7 +41,7 @@ function Ocorrencias() {
   const pedem = por("abertas").length + por("atendimento").length;
   const crit = doDia.filter((i) => isOpen(i) && i.severidade === "critico").length;
   const run = (p: Promise<unknown>, ok: string) => p.then(() => toast.success(ok)).catch((e: Error) => toast.error(`Não foi possível salvar: ${e.message}`));
-  const btn = "h-12 rounded-[10px] border border-[#343878] bg-card text-sm font-semibold hover:bg-accent";
+  const btn = "h-12 rounded-[10px] border border-border-strong bg-card text-sm font-semibold hover:bg-accent";
 
   return (
     <div className="mx-auto max-w-[760px] space-y-5 lg:max-w-6xl">
@@ -84,7 +84,7 @@ function Ocorrencias() {
               <li key={i.id} className={`space-y-2.5 rounded-xl border bg-card p-4 ${sev === "critico" && a !== "encerradas" ? "border-crit" : "border-border"}`}>
                 <div className="flex items-center justify-between gap-2">
                   <SevTag sev={sev} />
-                  <span className="font-mono text-[13px] text-[#8E98C8]">{fmtTime(i.criado_em).slice(0, 5)}</span>
+                  <span className="font-mono text-[13px] text-faint">{fmtTime(i.criado_em).slice(0, 5)}</span>
                 </div>
                 <div className="space-y-1">
                   <h2 className="font-display text-lg font-bold leading-[22px]">{i.detalhe || labelTipo(i.tipo)}</h2>
@@ -94,7 +94,7 @@ function Ocorrencias() {
                     <span className="text-sm text-muted-foreground">{i.device_id} · {zoneOf(i.zone_id).nome}</span>
                   )}
                   <AnaliseQueda r={i.snapshot} compacta />
-                  <p className="text-[13px] leading-[18px] text-[#8E98C8]">
+                  <p className="text-[13px] leading-[18px] text-faint">
                     {a === "encerradas"
                       ? `${i.status === "falso_positivo" ? "Falso positivo" : "Resolvida"}${i.resolvido_em ? ` às ${fmtTime(i.resolvido_em).slice(0, 5)}` : ""}${i.resolvido_por === "sistema" ? " · encerrada pelo sistema" : i.resolvido_por ? ` · ${i.resolvido_por}` : ""}`
                       : i.reconhecido_em
@@ -103,7 +103,7 @@ function Ocorrencias() {
                   </p>
                 </div>
                 {a === "abertas" && (
-                  <button type="button" className="h-12 w-full rounded-[10px] bg-surface-2 text-[15px] font-semibold hover:bg-[#343878]" onClick={() => void run(acknowledgeIncident(i.id), "Ocorrência reconhecida.")}>
+                  <button type="button" className="h-12 w-full rounded-[10px] bg-surface-2 text-[15px] font-semibold hover:bg-border-strong" onClick={() => void run(acknowledgeIncident(i.id), "Ocorrência reconhecida.")}>
                     Reconhecer
                   </button>
                 )}
@@ -118,7 +118,7 @@ function Ocorrencias() {
           })}
         </ul>
       )}
-      <p className="text-center text-xs text-[#8E98C8]">Cada ação fica registrada com o horário · dados usados apenas para segurança</p>
+      <p className="text-center text-xs text-faint">Cada ação fica registrada com o horário · dados usados apenas para segurança</p>
     </div>
   );
 }

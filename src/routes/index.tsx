@@ -34,10 +34,10 @@ function Monitor() {
   const crit = ws.find((x) => x.sev === "critico");
   const kpis = [
     ["EM CAMPO", ws.length, "EPIs vinculados no filtro", "text-foreground"],
-    ["OK", count("ok"), "dentro dos limites", "text-ok"],
-    ["ATENÇÃO", count("atencao"), "calor, gás ou umidade", "text-warn"],
-    ["CRÍTICO", count("critico"), crit ? `${(crit.motivo.split(" ·")[0] ?? "").toLowerCase()} — ${zoneOf(crit.w.zone_id).nome}` : "nenhum", "text-crit"],
-    ["OFFLINE", count("offline"), "sem sinal ou bateria", "text-off"],
+    ["OK", count("ok"), "dentro dos limites", "text-ok-ink"],
+    ["ATENÇÃO", count("atencao"), "calor, gás ou umidade", "text-warn-ink"],
+    ["CRÍTICO", count("critico"), crit ? `${(crit.motivo.split(" ·")[0] ?? "").toLowerCase()} — ${zoneOf(crit.w.zone_id).nome}` : "nenhum", "text-crit-ink"],
+    ["OFFLINE", count("offline"), "sem sinal ou bateria", "text-off-ink"],
     ["TEMP. MÁXIMA", hottest ? `${fmt1(s.current[hottest.w.device_id]?.temperatura)} °C` : "—", hottest ? zoneOf(hottest.w.zone_id).nome : "", "text-primary"],
   ] as const;
   const list = ws.filter((x) => x.w.nome.toLowerCase().includes(q.toLowerCase()));

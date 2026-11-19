@@ -103,7 +103,7 @@ function Perfil() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">{cards.map(([l, v, bad]) => <div key={l} className={`${card} ${bad ? "border-warn" : ""}`}><div className="text-xs text-muted-foreground">{l}</div><div className={`font-display tabular-nums text-2xl font-semibold ${bad ? "text-warn" : ""}`}>{v}</div>{bad && <div className="text-xs text-warn">▲ fora do limite</div>}</div>)}</div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">{cards.map(([l, v, bad]) => <div key={l} className={`${card} ${bad ? "border-warn" : ""}`}><div className="text-xs text-muted-foreground">{l}</div><div className={`font-display tabular-nums text-2xl font-semibold ${bad ? "text-warn-ink" : ""}`}>{v}</div>{bad && <div className="text-xs text-warn-ink">▲ fora do limite</div>}</div>)}</div>
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         <div className={card}>
           <h2 className="mb-2 font-semibold">Sensação térmica nas últimas 8 horas</h2>
