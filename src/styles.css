@@ -36,11 +36,57 @@
   --color-crit: var(--crit);
   --color-off: var(--off);
   --color-surface-2: var(--surface-2);
+  /* texto de status: no tema claro o preenchimento é forte demais para virar letra */
+  --color-ok-ink: var(--ok-ink);
+  --color-warn-ink: var(--warn-ink);
+  --color-crit-ink: var(--crit-ink);
+  --color-off-ink: var(--off-ink);
+  --color-on-crit: var(--on-crit);
+  --color-faint: var(--faint);
+  --color-border-strong: var(--border-strong);
+  --color-avatar: var(--avatar);
+  --color-noite: #15193F;                    /* azul-noite fixo: letra sobre avatar e sobre lavanda */
 }
 
 :root {
-  /* Estilo "LEPION — Noite Industrial" (design system aprovado, cores tiradas do pitch) */
+  /* Tema claro (padrão) do estilo "LEPION — Noite Industrial" */
   --radius: 0.75rem;                        /* radius-md 12px */
+  --background: #E6EAF3;                    /* fundo */
+  --foreground: #15193F;                    /* tinta = noite-900 */
+  --card: #FFFFFF;
+  --card-foreground: #15193F;
+  --surface-2: #F4F6FB;
+  --popover: #FFFFFF;
+  --popover-foreground: #15193F;
+  --primary: #3D5BD9;                       /* ação: lavanda escurecida para ter contraste no claro */
+  --primary-foreground: #FFFFFF;
+  --secondary: #E3E8FD;
+  --secondary-foreground: #15193F;
+  --muted: #F4F6FB;
+  --muted-foreground: #4A5178;              /* tinta-suave */
+  --accent: #E3E8FD;                        /* selecionado */
+  --accent-foreground: #15193F;
+  --destructive: #EF5350;
+  --destructive-foreground: #15193F;
+  --border: #DDE2EE;
+  --border-strong: #C9CFE3;
+  --input: #8A93B8;                         /* borda de campo com 3:1 sobre branco */
+  --ring: #3D5BD9;
+  --ok: #44C47A;
+  --warn: #F2B84B;
+  --crit: #EF5350;
+  --off: #8A93B8;
+  --ok-ink: #1B6E42;
+  --warn-ink: #8A5800;
+  --crit-ink: #C62828;
+  --off-ink: #5A6285;
+  --on-crit: #15193F;                       /* texto sobre o vermelho crítico */
+  --faint: #565D84;                         /* tinta-fraca */
+  --avatar: #DCE3FF;
+}
+
+/* Tema escuro (opção) e áreas sempre escuras, como o cabeçalho com o logo */
+.dark, .tema-escuro {
   --background: #15193F;                    /* noite-900 */
   --foreground: #E6E9FC;                    /* tinta */
   --card: #1F2458;                          /* noite-800 */
@@ -59,16 +105,26 @@
   --destructive: #FF6B6B;
   --destructive-foreground: #15193F;
   --border: #2A3070;                        /* noite-700 */
+  --border-strong: #343878;
   --input: #6477A1;                         /* linha-fraca: borda de campo com 3:1 */
   --ring: #8EA8FF;
   --ok: #44C47A;
   --warn: #F2B84B;
   --crit: #FF6B6B;                          /* critico-texto: legível como texto e como preenchimento */
   --off: #8A93B8;
+  --ok-ink: #44C47A;
+  --warn-ink: #F2B84B;
+  --crit-ink: #FF6B6B;
+  --off-ink: #8A93B8;
+  --on-crit: #15193F;
+  --faint: #8E98C8;
+  --avatar: #C4D0F8;
 }
 
 @layer base {
   * { border-color: var(--color-border); }
+  html { color-scheme: light; }
+  html.dark { color-scheme: dark; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

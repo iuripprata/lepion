@@ -2,7 +2,7 @@ import type { Sev } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const SEV_LABEL: Record<Sev, string> = { ok: "OK", atencao: "ATENÇÃO", critico: "CRÍTICO", offline: "OFFLINE" };
-const TEXT: Record<Sev, string> = { ok: "text-ok", atencao: "text-warn", critico: "text-crit", offline: "text-off" };
+const TEXT: Record<Sev, string> = { ok: "text-ok-ink", atencao: "text-warn-ink", critico: "text-crit-ink", offline: "text-off-ink" };
 const BORDER: Record<Sev, string> = { ok: "border-ok/50", atencao: "border-warn/60", critico: "border-crit", offline: "border-off/50" };
 export const sevText = (s: Sev) => TEXT[s];
 export const sevBorder = (s: Sev) => BORDER[s];

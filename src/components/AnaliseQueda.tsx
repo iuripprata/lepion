@@ -28,7 +28,7 @@ export function AnaliseQueda({ r, compacta = false }: { r: Reading; compacta?: b
         <div>
           <div className="text-xs uppercase text-muted-foreground">Tipo provável</div>
           <div className="font-display text-xl font-semibold">{a.tipo ?? "Não informado"}</div>
-          {a.consciente && <div className={`text-sm ${a.desacordado ? "font-semibold text-crit" : "text-muted-foreground"}`}>{a.consciente}</div>}
+          {a.consciente && <div className={`text-sm ${a.desacordado ? "font-semibold text-crit-ink" : "text-muted-foreground"}`}>{a.consciente}</div>}
         </div>
         {a.ia !== null && (
           <div>

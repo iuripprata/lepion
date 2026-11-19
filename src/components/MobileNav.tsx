@@ -33,7 +33,7 @@ export function MobileNav() {
           <span className="relative">
             <Icon className="size-[22px]" strokeWidth={1.8} aria-hidden />
             {to === "/ocorrencias" && abertas > 0 && (
-              <span className="absolute -right-3 -top-1.5 min-w-[18px] rounded-full bg-crit px-1 text-center font-sans text-[11px] font-bold leading-[18px] text-background">
+              <span className="absolute -right-3 -top-1.5 min-w-[18px] rounded-full bg-crit px-1 text-center font-sans text-[11px] font-bold leading-[18px] text-on-crit">
                 {abertas > 99 ? "99+" : abertas}
               </span>
             )}

@@ -21,7 +21,7 @@ export function CriticalBanner() {
   const mais = crits.length - 1;
   const conteudo = (
     <>
-      <svg viewBox="0 0 12 12" className="size-7 shrink-0 fill-background" aria-hidden><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" /></svg>
+      <svg viewBox="0 0 12 12" className="size-7 shrink-0 fill-on-crit" aria-hidden><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" /></svg>
       <span className="min-w-0 flex-1 text-left">
         <span className="block text-xs font-bold uppercase tracking-[0.08em]">
           Crítico · {pendente ? "ninguém reconheceu ainda" : "em atendimento"}{mais > 0 ? ` · +${mais}` : ""}
@@ -37,7 +37,7 @@ export function CriticalBanner() {
       </span>
     </>
   );
-  const cls = "flex w-full items-center gap-3 rounded-xl bg-crit p-4 text-background hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+  const cls = "flex w-full items-center gap-3 rounded-xl bg-crit p-4 text-on-crit hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
   if (pendente || !w) {
     return <button type="button" className={cls} onClick={() => abrirAlerta(inc.id)}>{conteudo}</button>;
   }
